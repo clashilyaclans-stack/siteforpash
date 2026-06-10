@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+.env.local
+.env*.local
+.vercel
+.superpowers
+docs/superpowers/
+npm-debug.log*
+*.tsbuildinfo
+
+.vercel
