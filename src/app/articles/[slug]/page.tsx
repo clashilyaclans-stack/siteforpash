@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Home } from "lucide-react";
+import { SiteHeader } from "@/components/SiteHeader";
 import { getArticle, getSiteContent, getVisibleArticles } from "@/lib/content";
 
 type ArticlePageProps = {
@@ -25,48 +26,54 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   }
 
   return (
-    <main className="app-background">
-      <article className="phone-screen article-detail-phone">
-        <div className="phone-status">
-          <span>9:41</span>
-          <span>•••</span>
-        </div>
+    <div className="site-page">
+      <SiteHeader content={content} />
+      <main>
+        <article className="article-detail">
+          <div className="site-container article-detail-inner">
+            <div className="article-nav-row">
+              <Link className="back-link" href="/articles">
+                <ArrowLeft size={18} />
+                Назад к статьям
+              </Link>
+              <Link className="back-link" href="/">
+                <Home size={18} />
+                Главная
+              </Link>
+            </div>
 
-        <Link href="/articles" className="back-link">
-          <ArrowLeft size={18} />
-          Назад к списку статей
-        </Link>
+            <header className="article-detail-head">
+              <h1>{article.title}</h1>
+              <time>{article.date}</time>
+              <Image alt="" src={article.imageUrl} width={1120} height={620} priority />
+              <p>{article.excerpt}</p>
+            </header>
 
-        <header className="article-detail-head">
-          <h1>{article.title}</h1>
-          <time>{article.date}</time>
-          <Image alt="" src={article.imageUrl} width={760} height={420} priority />
-          <p>{article.excerpt}</p>
-        </header>
-
-        <div className="article-body">
-          {article.sections.map((section) => (
-            <section key={section.id}>
-              <h2>{section.heading}</h2>
-              <p>{section.text}</p>
-              {section.imageUrl ? (
-                <Image alt="" src={section.imageUrl} width={760} height={420} />
-              ) : null}
-            </section>
-          ))}
-        </div>
-
-        {article.sources.length ? (
-          <footer className="sources">
-            <h2>Источники</h2>
-            <ul>
-              {article.sources.map((source) => (
-                <li key={source}>{source}</li>
+            <div className="article-body">
+              {article.sections.map((section) => (
+                <section key={section.id}>
+                  <h2>{section.heading}</h2>
+                  <p>{section.text}</p>
+                  {section.imageUrl ? (
+                    <Image alt="" src={section.imageUrl} width={1120} height={620} />
+                  ) : null}
+                </section>
               ))}
-            </ul>
-          </footer>
-        ) : null}
-      </article>
-    </main>
+            </div>
+
+            {article.sources.length ? (
+              <footer className="sources">
+                <h2>Источники</h2>
+                <ul>
+                  {article.sources.map((source) => (
+                    <li key={source}>{source}</li>
+                  ))}
+                </ul>
+              </footer>
+            ) : null}
+          </div>
+        </article>
+      </main>
+    </div>
   );
 }

@@ -1,13 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ChevronRight,
-  Maximize2,
-  MessageCircle,
-  Play,
-  Send
-} from "lucide-react";
+import { ArrowRight, MessageCircle, Play, Send } from "lucide-react";
 import { AppIcon } from "@/components/AppIcon";
+import { SiteHeader } from "@/components/SiteHeader";
 import { getSiteContent } from "@/lib/content";
 import type { InfoBlock } from "@/lib/types";
 
@@ -18,108 +13,102 @@ export default async function HomePage() {
     .sort((left, right) => left.order - right.order);
 
   return (
-    <main className="app-background">
-      <section className="phone-screen home-phone" aria-label="Вводная страница">
-        <div className="phone-status">
-          <span>9:41</span>
-          <span>•••</span>
-        </div>
+    <div className="site-page">
+      <SiteHeader content={content} />
+      <main>
+        <section className="hero-section">
+          <div className="site-container hero-layout">
+            <div className="hero-photo">
+              <Image
+                alt={content.home.teacherName}
+                src={content.home.avatarUrl}
+                width={420}
+                height={420}
+                priority
+              />
+            </div>
 
-        <button className="settings-dot" aria-label="Настройки" type="button">
-          <span />
-          <span />
-          <span />
-        </button>
-
-        <header className="profile-head">
-          <div className="avatar-ring">
-            <Image
-              alt={content.home.teacherName}
-              src={content.home.avatarUrl}
-              width={148}
-              height={148}
-              priority
-            />
+            <div className="hero-content">
+              <span className="section-kicker">Репетитор по математике</span>
+              <h1>{content.home.teacherName}</h1>
+              <p className="hero-role">{content.home.teacherRole}</p>
+              <p>{content.home.shortBio}</p>
+              <div className="cta-row">
+                <a href={content.settings.messengers.telegramUrl} target="_blank" rel="noreferrer">
+                  <Send size={19} />
+                  {content.settings.messengers.primaryLabel}
+                </a>
+                <a href={content.settings.messengers.whatsappUrl} target="_blank" rel="noreferrer">
+                  <MessageCircle size={19} />
+                  {content.settings.messengers.secondaryLabel}
+                </a>
+              </div>
+            </div>
           </div>
-          <h1>{content.home.teacherName}</h1>
-          <p>{content.home.teacherRole}</p>
-        </header>
+        </section>
 
-        <div className="home-block-list">
-          {visibleBlocks.slice(0, 2).map((block) => (
-            <InfoTile key={block.id} block={block} />
-          ))}
+        <section className="content-section">
+          <div className="site-container section-heading">
+            <div>
+              <span className="section-kicker">Структура и описание</span>
+              <h2>Все важное для подготовки в одном месте</h2>
+            </div>
+            <Link className="text-link" href="/articles">
+              Перейти к статьям
+              <ArrowRight size={18} />
+            </Link>
+          </div>
 
-          {content.video.visible ? (
-            <article className="info-tile video-tile">
-              <div className="tile-title">
-                <span className="tile-icon">
-                  <AppIcon name="video" />
-                </span>
+          <div className="site-container home-grid">
+            {visibleBlocks.map((block) => (
+              <InfoTile key={block.id} block={block} />
+            ))}
+          </div>
+        </section>
+
+        {content.video.visible ? (
+          <section className="content-section video-section">
+            <div className="site-container video-layout">
+              <div>
+                <span className="section-kicker">Видео-блок</span>
                 <h2>{content.video.title}</h2>
+                <p>{content.video.description}</p>
               </div>
-              <div className="video-frame">
-                <Image
-                  alt=""
-                  src={content.video.posterUrl}
-                  width={700}
-                  height={390}
-                />
+              <div className="site-video-frame">
+                <Image alt="" src={content.video.posterUrl} width={860} height={480} />
                 <span className="play-button">
-                  <Play fill="currentColor" size={28} />
+                  <Play fill="currentColor" size={30} />
                 </span>
-                <span className="video-time">0:00 / 1:35</span>
-                <Maximize2 className="video-fullscreen" size={17} />
               </div>
-              <p>{content.video.description}</p>
-            </article>
-          ) : null}
-
-          {visibleBlocks.slice(2).map((block) => (
-            <InfoTile key={block.id} block={block} />
-          ))}
-        </div>
-
-        <footer className="phone-actions">
-          <a href={content.settings.messengers.telegramUrl} target="_blank" rel="noreferrer">
-            <Send size={18} />
-            {content.settings.messengers.primaryLabel}
-          </a>
-          <a href={content.settings.messengers.whatsappUrl} target="_blank" rel="noreferrer">
-            <MessageCircle size={18} />
-            {content.settings.messengers.secondaryLabel}
-          </a>
-        </footer>
-      </section>
-    </main>
+            </div>
+          </section>
+        ) : null}
+      </main>
+    </div>
   );
 }
 
 function InfoTile({ block }: { block: InfoBlock }) {
-  const body = (
+  const content = (
     <>
-      <div className="tile-title">
-        <span className="tile-icon">
-          <AppIcon name={block.icon} />
-        </span>
-        <h2>{block.title}</h2>
+      <span className="tile-icon">
+        <AppIcon name={block.icon} />
+      </span>
+      <div>
+        <h3>{block.title}</h3>
+        <p>{block.description}</p>
       </div>
-      <p>{block.description}</p>
-      {block.href ? (
-        <span className="tile-arrow">
-          <ChevronRight size={22} />
-        </span>
-      ) : null}
+      {block.href ? <ArrowRight className="card-arrow" size={20} /> : null}
     </>
   );
 
   if (block.href) {
     return (
-      <Link className="info-tile clickable" href={block.href}>
-        {body}
+      <Link className="info-card clickable" href={block.href}>
+        {content}
       </Link>
     );
   }
 
-  return <article className="info-tile">{body}</article>;
+  return <article className="info-card">{content}</article>;
 }
