@@ -6,6 +6,9 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { getSiteContent } from "@/lib/content";
 import type { InfoBlock } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function HomePage() {
   const content = await getSiteContent();
   const visibleBlocks = [...content.infoBlocks]

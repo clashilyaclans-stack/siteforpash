@@ -1,5 +1,6 @@
 "use client";
 
+import type { Dispatch, FormEvent, SetStateAction } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
@@ -17,17 +18,11 @@ import type {
   ArticleSection,
   IconName,
   InfoBlock,
+  PageConfig,
   SiteContent
 } from "@/lib/types";
 
-type AdminTab =
-  | "profile"
-  | "blocks"
-  | "video"
-  | "articles"
-  | "important"
-  | "contacts"
-  | "settings";
+type AdminTab = "homePage" | "articlesPage" | "articleItems" | "contacts" | "settings";
 
 type AdminAppProps = {
   initialContent: SiteContent;
@@ -35,11 +30,9 @@ type AdminAppProps = {
 };
 
 const tabs: { key: AdminTab; label: string }[] = [
-  { key: "profile", label: "Профиль" },
-  { key: "blocks", label: "Блоки" },
-  { key: "video", label: "Видео" },
-  { key: "articles", label: "Статьи" },
-  { key: "important", label: "Важно" },
+  { key: "homePage", label: "Главная" },
+  { key: "articlesPage", label: "Страница статей" },
+  { key: "articleItems", label: "Статьи" },
   { key: "contacts", label: "Контакты" },
   { key: "settings", label: "Настройки" }
 ];
@@ -58,7 +51,7 @@ const iconOptions: IconName[] = [
 export function AdminApp({ initialContent, supabaseConfigured }: AdminAppProps) {
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const [content, setContent] = useState<SiteContent>(initialContent);
-  const [activeTab, setActiveTab] = useState<AdminTab>("profile");
+  const [activeTab, setActiveTab] = useState<AdminTab>("homePage");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isAuthed, setIsAuthed] = useState(!supabaseConfigured);
@@ -104,7 +97,7 @@ export function AdminApp({ initialContent, supabaseConfigured }: AdminAppProps) 
     });
   }, [loadCloudContent, supabase]);
 
-  async function signIn(event: React.FormEvent<HTMLFormElement>) {
+  async function signIn(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!supabase) {
@@ -144,7 +137,12 @@ export function AdminApp({ initialContent, supabaseConfigured }: AdminAppProps) 
       .upsert({ id: "main", content }, { onConflict: "id" });
     setBusy(false);
 
-    setStatus(error ? `Ошибка сохранения: ${error.message}` : "Сохранено. Обновите сайт.");
+    if (error) {
+      setStatus(`Ошибка сохранения: ${error.message}`);
+      return;
+    }
+
+    setStatus("Сохранено. Изменения сразу читаются сайтом из Supabase.");
   }
 
   async function uploadImage(file: File, onUrl: (url: string) => void) {
@@ -169,7 +167,7 @@ export function AdminApp({ initialContent, supabaseConfigured }: AdminAppProps) 
 
     const { data } = supabase.storage.from("site-media").getPublicUrl(path);
     onUrl(data.publicUrl);
-    setStatus("Фото загружено. Нажмите “Сохранить”, чтобы применить.");
+    setStatus("Фото загружено. Нажмите «Сохранить», чтобы применить.");
   }
 
   if (!isAuthed) {
@@ -248,20 +246,14 @@ export function AdminApp({ initialContent, supabaseConfigured }: AdminAppProps) 
       <section className="admin-status-line">{status}</section>
 
       <section className="admin-panel">
-        {activeTab === "profile" ? (
-          <ProfileEditor content={content} setContent={setContent} uploadImage={uploadImage} />
+        {activeTab === "homePage" ? (
+          <HomePageEditor content={content} setContent={setContent} uploadImage={uploadImage} />
         ) : null}
-        {activeTab === "blocks" ? (
-          <BlocksEditor content={content} setContent={setContent} />
+        {activeTab === "articlesPage" ? (
+          <ArticlesPageEditor content={content} setContent={setContent} />
         ) : null}
-        {activeTab === "video" ? (
-          <VideoEditor content={content} setContent={setContent} uploadImage={uploadImage} />
-        ) : null}
-        {activeTab === "articles" ? (
+        {activeTab === "articleItems" ? (
           <ArticlesEditor content={content} setContent={setContent} uploadImage={uploadImage} />
-        ) : null}
-        {activeTab === "important" ? (
-          <ImportantEditor content={content} setContent={setContent} />
         ) : null}
         {activeTab === "contacts" ? (
           <ContactsEditor content={content} setContent={setContent} />
@@ -276,10 +268,101 @@ export function AdminApp({ initialContent, supabaseConfigured }: AdminAppProps) 
 
 type EditorProps = {
   content: SiteContent;
-  setContent: React.Dispatch<React.SetStateAction<SiteContent>>;
+  setContent: Dispatch<SetStateAction<SiteContent>>;
 };
 
 type UploadFn = (file: File, onUrl: (url: string) => void) => Promise<void>;
+
+function HomePageEditor({
+  content,
+  setContent,
+  uploadImage
+}: EditorProps & { uploadImage: UploadFn }) {
+  return (
+    <div className="admin-stack">
+      <AdminSectionTitle
+        title="Страница 1: Главная"
+        text="Здесь редактируются шапка главной страницы, профиль, блоки и видео."
+      />
+      <PageMetaEditor pageKey="home" content={content} setContent={setContent} />
+      <ProfileEditor content={content} setContent={setContent} uploadImage={uploadImage} />
+      <BlocksEditor content={content} setContent={setContent} />
+      <VideoEditor content={content} setContent={setContent} uploadImage={uploadImage} />
+    </div>
+  );
+}
+
+function ArticlesPageEditor({ content, setContent }: EditorProps) {
+  return (
+    <div className="admin-stack">
+      <AdminSectionTitle
+        title="Страница 2: Статьи"
+        text="Здесь редактируются заголовок страницы статей и блок «Важно»."
+      />
+      <PageMetaEditor pageKey="articles" content={content} setContent={setContent} />
+      <ImportantEditor content={content} setContent={setContent} />
+    </div>
+  );
+}
+
+function AdminSectionTitle({ text, title }: { text: string; title: string }) {
+  return (
+    <div className="admin-section-title">
+      <h2>{title}</h2>
+      <p>{text}</p>
+    </div>
+  );
+}
+
+function PageMetaEditor({
+  content,
+  pageKey,
+  setContent
+}: EditorProps & { pageKey: PageConfig["key"] }) {
+  const page = content.pages.find((item) => item.key === pageKey);
+
+  if (!page) {
+    return <div className="admin-status-line">Настройки страницы не найдены.</div>;
+  }
+
+  return (
+    <article className="admin-edit-card">
+      <div className="admin-card-head">
+        <strong>Настройки страницы</strong>
+        <Link href={page.href} target="_blank">
+          Открыть
+        </Link>
+      </div>
+      <div className="admin-inline">
+        <TextField
+          label="Пункт меню"
+          value={page.navLabel}
+          onChange={(value) => updatePage(setContent, page.key, { navLabel: value })}
+        />
+        <TextField
+          label="Порядок"
+          value={String(page.order)}
+          onChange={(value) => updatePage(setContent, page.key, { order: Number(value) || 1 })}
+        />
+      </div>
+      <TextField
+        label="Заголовок страницы"
+        value={page.title}
+        onChange={(value) => updatePage(setContent, page.key, { title: value })}
+      />
+      <TextField
+        label="Подзаголовок страницы"
+        textarea
+        value={page.subtitle}
+        onChange={(value) => updatePage(setContent, page.key, { subtitle: value })}
+      />
+      <VisibilityField
+        checked={page.visible}
+        onChange={(visible) => updatePage(setContent, page.key, { visible })}
+      />
+    </article>
+  );
+}
 
 function ProfileEditor({
   content,
@@ -287,47 +370,70 @@ function ProfileEditor({
   uploadImage
 }: EditorProps & { uploadImage: UploadFn }) {
   return (
-    <div className="admin-form-grid">
-      <TextField label="Имя" value={content.home.teacherName} onChange={(value) => setHome(setContent, { teacherName: value })} />
-      <TextField label="Специализация" value={content.home.teacherRole} onChange={(value) => setHome(setContent, { teacherRole: value })} />
-      <TextField label="Краткое приветствие" textarea value={content.home.shortBio} onChange={(value) => setHome(setContent, { shortBio: value })} />
-      <ImageField
-        label="Аватар"
-        value={content.home.avatarUrl}
-        onUpload={(file) => uploadImage(file, (url) => setHome(setContent, { avatarUrl: url }))}
-      />
-    </div>
+    <article className="admin-edit-card">
+      <div className="admin-card-head">
+        <strong>Профиль преподавателя</strong>
+      </div>
+      <div className="admin-form-grid">
+        <TextField
+          label="Имя"
+          value={content.home.teacherName}
+          onChange={(value) => setHome(setContent, { teacherName: value })}
+        />
+        <TextField
+          label="Специализация"
+          value={content.home.teacherRole}
+          onChange={(value) => setHome(setContent, { teacherRole: value })}
+        />
+        <TextField
+          label="Краткое приветствие"
+          textarea
+          value={content.home.shortBio}
+          onChange={(value) => setHome(setContent, { shortBio: value })}
+        />
+        <ImageField
+          label="Аватар"
+          value={content.home.avatarUrl}
+          onUpload={(file) => uploadImage(file, (url) => setHome(setContent, { avatarUrl: url }))}
+        />
+      </div>
+    </article>
   );
 }
 
 function BlocksEditor({ content, setContent }: EditorProps) {
   return (
-    <div className="admin-stack">
-      <button className="admin-secondary" onClick={() => addInfoBlock(setContent)} type="button">
-        <Plus size={18} />
-        Добавить блок
-      </button>
-      {[...content.infoBlocks].sort((left, right) => left.order - right.order).map((block) => (
-        <article className="admin-edit-card" key={block.id}>
-          <div className="admin-card-head">
-            <strong>{block.title}</strong>
-            <button className="icon-danger" onClick={() => removeInfoBlock(setContent, block.id)} type="button">
-              <Trash2 size={18} />
-            </button>
-          </div>
-          <div className="admin-inline">
-            <TextField label="Заголовок" value={block.title} onChange={(value) => updateInfoBlock(setContent, block.id, { title: value })} />
-            <SelectField label="Иконка" value={block.icon} options={iconOptions} onChange={(value) => updateInfoBlock(setContent, block.id, { icon: value as IconName })} />
-          </div>
-          <TextField label="Текст" textarea value={block.description} onChange={(value) => updateInfoBlock(setContent, block.id, { description: value })} />
-          <div className="admin-inline">
-            <TextField label="Ссылка" value={block.href || ""} onChange={(value) => updateInfoBlock(setContent, block.id, { href: value })} />
-            <TextField label="Порядок" value={String(block.order)} onChange={(value) => updateInfoBlock(setContent, block.id, { order: Number(value) || 1 })} />
-          </div>
-          <VisibilityField checked={block.visible} onChange={(visible) => updateInfoBlock(setContent, block.id, { visible })} />
-        </article>
-      ))}
-    </div>
+    <article className="admin-edit-card">
+      <div className="admin-card-head">
+        <strong>Блоки главной</strong>
+        <button className="admin-secondary" onClick={() => addInfoBlock(setContent)} type="button">
+          <Plus size={18} />
+          Добавить блок
+        </button>
+      </div>
+      <div className="admin-stack">
+        {[...content.infoBlocks].sort((left, right) => left.order - right.order).map((block) => (
+          <article className="admin-edit-card" key={block.id}>
+            <div className="admin-card-head">
+              <strong>{block.title}</strong>
+              <button className="icon-danger" onClick={() => removeInfoBlock(setContent, block.id)} type="button">
+                <Trash2 size={18} />
+              </button>
+            </div>
+            <div className="admin-inline">
+              <TextField label="Заголовок" value={block.title} onChange={(value) => updateInfoBlock(setContent, block.id, { title: value })} />
+              <SelectField label="Иконка" value={block.icon} options={iconOptions} onChange={(value) => updateInfoBlock(setContent, block.id, { icon: value as IconName })} />
+            </div>
+            <TextField label="Текст" textarea value={block.description} onChange={(value) => updateInfoBlock(setContent, block.id, { description: value })} />
+            <div className="admin-inline">
+              <TextField label="Ссылка" value={block.href || ""} onChange={(value) => updateInfoBlock(setContent, block.id, { href: value })} />
+              <TextField label="Порядок" value={String(block.order)} onChange={(value) => updateInfoBlock(setContent, block.id, { order: Number(value) || 1 })} />
+            </div>
+            <VisibilityField checked={block.visible} onChange={(visible) => updateInfoBlock(setContent, block.id, { visible })} />
+          </article>
+        ))}
+      </div>
+    </article>
   );
 }
 
@@ -337,17 +443,22 @@ function VideoEditor({
   uploadImage
 }: EditorProps & { uploadImage: UploadFn }) {
   return (
-    <div className="admin-form-grid">
-      <TextField label="Заголовок видео" value={content.video.title} onChange={(value) => setVideo(setContent, { title: value })} />
-      <TextField label="Ссылка на видео" value={content.video.videoUrl} onChange={(value) => setVideo(setContent, { videoUrl: value })} />
-      <TextField label="Описание" textarea value={content.video.description} onChange={(value) => setVideo(setContent, { description: value })} />
-      <ImageField
-        label="Обложка видео"
-        value={content.video.posterUrl}
-        onUpload={(file) => uploadImage(file, (url) => setVideo(setContent, { posterUrl: url }))}
-      />
-      <VisibilityField checked={content.video.visible} onChange={(visible) => setVideo(setContent, { visible })} />
-    </div>
+    <article className="admin-edit-card">
+      <div className="admin-card-head">
+        <strong>Видео на главной</strong>
+      </div>
+      <div className="admin-form-grid">
+        <TextField label="Заголовок видео" value={content.video.title} onChange={(value) => setVideo(setContent, { title: value })} />
+        <TextField label="Ссылка на видео" value={content.video.videoUrl} onChange={(value) => setVideo(setContent, { videoUrl: value })} />
+        <TextField label="Описание" textarea value={content.video.description} onChange={(value) => setVideo(setContent, { description: value })} />
+        <ImageField
+          label="Обложка видео"
+          value={content.video.posterUrl}
+          onUpload={(file) => uploadImage(file, (url) => setVideo(setContent, { posterUrl: url }))}
+        />
+        <VisibilityField checked={content.video.visible} onChange={(visible) => setVideo(setContent, { visible })} />
+      </div>
+    </article>
   );
 }
 
@@ -358,6 +469,10 @@ function ArticlesEditor({
 }: EditorProps & { uploadImage: UploadFn }) {
   return (
     <div className="admin-stack">
+      <AdminSectionTitle
+        title="Полные статьи"
+        text="Создание, порядок, изображения, разделы и источники для каждой статьи."
+      />
       <button className="admin-secondary" onClick={() => addArticle(setContent)} type="button">
         <Plus size={18} />
         Добавить статью
@@ -434,11 +549,16 @@ function SectionsEditor({
 
 function ImportantEditor({ content, setContent }: EditorProps) {
   return (
-    <div className="admin-form-grid">
-      <TextField label="Заголовок" value={content.important.title} onChange={(value) => setImportant(setContent, { title: value })} />
-      <TextField label="Текст" textarea value={content.important.text} onChange={(value) => setImportant(setContent, { text: value })} />
-      <VisibilityField checked={content.important.visible} onChange={(visible) => setImportant(setContent, { visible })} />
-    </div>
+    <article className="admin-edit-card">
+      <div className="admin-card-head">
+        <strong>Блок «Важно»</strong>
+      </div>
+      <div className="admin-form-grid">
+        <TextField label="Заголовок" value={content.important.title} onChange={(value) => setImportant(setContent, { title: value })} />
+        <TextField label="Текст" textarea value={content.important.text} onChange={(value) => setImportant(setContent, { text: value })} />
+        <VisibilityField checked={content.important.visible} onChange={(visible) => setImportant(setContent, { visible })} />
+      </div>
+    </article>
   );
 }
 
@@ -446,24 +566,36 @@ function ContactsEditor({ content, setContent }: EditorProps) {
   const messengers = content.settings.messengers;
 
   return (
-    <div className="admin-form-grid">
-      <TextField label="Telegram ссылка" value={messengers.telegramUrl} onChange={(value) => updateMessengers(setContent, { telegramUrl: value })} />
-      <TextField label="WhatsApp ссылка" value={messengers.whatsappUrl} onChange={(value) => updateMessengers(setContent, { whatsappUrl: value })} />
-      <TextField label="Max ссылка" value={messengers.maxUrl} onChange={(value) => updateMessengers(setContent, { maxUrl: value })} />
-      <TextField label="Главная кнопка" value={messengers.primaryLabel} onChange={(value) => updateMessengers(setContent, { primaryLabel: value })} />
-      <TextField label="Вторая кнопка" value={messengers.secondaryLabel} onChange={(value) => updateMessengers(setContent, { secondaryLabel: value })} />
+    <div className="admin-stack">
+      <AdminSectionTitle
+        title="Контакты и кнопки"
+        text="Ссылки и подписи кнопок связи на сайте."
+      />
+      <div className="admin-form-grid">
+        <TextField label="Telegram ссылка" value={messengers.telegramUrl} onChange={(value) => updateMessengers(setContent, { telegramUrl: value })} />
+        <TextField label="WhatsApp ссылка" value={messengers.whatsappUrl} onChange={(value) => updateMessengers(setContent, { whatsappUrl: value })} />
+        <TextField label="Max ссылка" value={messengers.maxUrl} onChange={(value) => updateMessengers(setContent, { maxUrl: value })} />
+        <TextField label="Главная кнопка" value={messengers.primaryLabel} onChange={(value) => updateMessengers(setContent, { primaryLabel: value })} />
+        <TextField label="Вторая кнопка" value={messengers.secondaryLabel} onChange={(value) => updateMessengers(setContent, { secondaryLabel: value })} />
+      </div>
     </div>
   );
 }
 
 function SettingsEditor({ content, setContent }: EditorProps) {
   return (
-    <div className="admin-form-grid">
-      <TextField label="Название сайта" value={content.settings.siteName} onChange={(value) => updateSettings(setContent, { siteName: value })} />
-      <TextField label="Лого в шапке" value={content.settings.logoLabel} onChange={(value) => updateSettings(setContent, { logoLabel: value })} />
-      <TextField label="SEO title" value={content.settings.seoTitle} onChange={(value) => updateSettings(setContent, { seoTitle: value })} />
-      <TextField label="SEO description" textarea value={content.settings.seoDescription} onChange={(value) => updateSettings(setContent, { seoDescription: value })} />
-      <TextField label="Акцентный цвет" value={content.settings.accentColor} onChange={(value) => updateSettings(setContent, { accentColor: value })} />
+    <div className="admin-stack">
+      <AdminSectionTitle
+        title="Общие настройки"
+        text="Название сайта, SEO и базовый цвет проекта."
+      />
+      <div className="admin-form-grid">
+        <TextField label="Название сайта" value={content.settings.siteName} onChange={(value) => updateSettings(setContent, { siteName: value })} />
+        <TextField label="Лого в шапке" value={content.settings.logoLabel} onChange={(value) => updateSettings(setContent, { logoLabel: value })} />
+        <TextField label="SEO title" value={content.settings.seoTitle} onChange={(value) => updateSettings(setContent, { seoTitle: value })} />
+        <TextField label="SEO description" textarea value={content.settings.seoDescription} onChange={(value) => updateSettings(setContent, { seoDescription: value })} />
+        <TextField label="Акцентный цвет" value={content.settings.accentColor} onChange={(value) => updateSettings(setContent, { accentColor: value })} />
+      </div>
     </div>
   );
 }
@@ -561,6 +693,17 @@ function ImageField({
       </small>
     </label>
   );
+}
+
+function updatePage(
+  setContent: EditorProps["setContent"],
+  key: PageConfig["key"],
+  patch: Partial<PageConfig>
+) {
+  setContent((current) => ({
+    ...current,
+    pages: current.pages.map((page) => (page.key === key ? { ...page, ...patch } : page))
+  }));
 }
 
 function setHome(setContent: EditorProps["setContent"], patch: Partial<SiteContent["home"]>) {

@@ -851,6 +851,29 @@ img {
   padding: 14px;
 }
 
+.admin-section-title {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.admin-section-title h2,
+.admin-section-title p {
+  margin: 0;
+}
+
+.admin-section-title h2 {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: clamp(30px, 4vw, 44px);
+  line-height: 1;
+}
+
+.admin-section-title p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
 .admin-form-grid,
 .admin-stack {
   display: grid;

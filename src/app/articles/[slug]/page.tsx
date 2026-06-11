@@ -3,18 +3,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Home } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
-import { getArticle, getSiteContent, getVisibleArticles } from "@/lib/content";
+import { getArticle, getSiteContent } from "@/lib/content";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 type ArticlePageProps = {
   params: Promise<{
     slug: string;
   }>;
 };
-
-export async function generateStaticParams() {
-  const content = await getSiteContent();
-  return getVisibleArticles(content).map((article) => ({ slug: article.slug }));
-}
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { slug } = await params;

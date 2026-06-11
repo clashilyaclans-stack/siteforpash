@@ -4,10 +4,14 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, ShieldAlert } from "lucide-react";
 import { AppIcon } from "@/components/AppIcon";
 import { SiteHeader } from "@/components/SiteHeader";
-import { getSiteContent, getVisibleArticles } from "@/lib/content";
+import { getPage, getSiteContent, getVisibleArticles } from "@/lib/content";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function ArticlesPage() {
   const content = await getSiteContent();
+  const page = getPage(content, "articles");
   const articles = getVisibleArticles(content);
 
   return (
@@ -21,11 +25,8 @@ export default async function ArticlesPage() {
               На главную
             </Link>
             <span className="section-kicker">Journal / exam notes</span>
-            <h1>Полевой журнал подготовки</h1>
-            <p>
-              Короткие разборы, официальные источники и практические маршруты для ученика,
-              который хочет понимать, а не угадывать.
-            </p>
+            <h1>{page.title}</h1>
+            <p>{page.subtitle}</p>
           </div>
         </section>
 
