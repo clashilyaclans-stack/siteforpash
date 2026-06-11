@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, ShieldAlert } from "lucide-react";
@@ -19,9 +20,12 @@ export default async function ArticlesPage() {
               <ArrowLeft size={18} />
               На главную
             </Link>
-            <span className="section-kicker">Страница 2</span>
-            <h1>Полезные статьи</h1>
-            <p>Материалы, разборы заданий и советы для подготовки к ОГЭ по математике.</p>
+            <span className="section-kicker">Journal / exam notes</span>
+            <h1>Полевой журнал подготовки</h1>
+            <p>
+              Короткие разборы, официальные источники и практические маршруты для ученика,
+              который хочет понимать, а не угадывать.
+            </p>
           </div>
         </section>
 
@@ -30,7 +34,7 @@ export default async function ArticlesPage() {
             {content.important.visible ? (
               <article className="important-card">
                 <span className="important-icon">
-                  <ShieldAlert size={34} />
+                  <ShieldAlert size={32} />
                 </span>
                 <div>
                   <h2>{content.important.title}</h2>
@@ -43,7 +47,10 @@ export default async function ArticlesPage() {
               {articles.map((article) => (
                 <article className="article-card" key={article.id}>
                   <div className="article-card-head">
-                    <span className="article-icon" style={{ backgroundColor: article.color }}>
+                    <span
+                      className="article-icon"
+                      style={{ "--article-color": article.color } as CSSProperties}
+                    >
                       <AppIcon name={article.icon} />
                     </span>
                     <div>
@@ -51,7 +58,7 @@ export default async function ArticlesPage() {
                       <time>{article.date}</time>
                     </div>
                   </div>
-                  <Image alt="" src={article.imageUrl} width={640} height={360} />
+                  <Image alt="" src={article.imageUrl} width={700} height={420} />
                   <p>{article.excerpt}</p>
                   <Link className="read-full" href={`/articles/${article.slug}`}>
                     Читать полностью

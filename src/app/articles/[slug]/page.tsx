@@ -34,7 +34,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             <div className="article-nav-row">
               <Link className="back-link" href="/articles">
                 <ArrowLeft size={18} />
-                Назад к статьям
+                Назад к журналу
               </Link>
               <Link className="back-link" href="/">
                 <Home size={18} />
@@ -43,8 +43,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             </div>
 
             <header className="article-detail-head">
+              <span className="section-kicker">Разбор / {article.date}</span>
               <h1>{article.title}</h1>
-              <time>{article.date}</time>
               <Image alt="" src={article.imageUrl} width={1120} height={620} priority />
               <p>{article.excerpt}</p>
             </header>

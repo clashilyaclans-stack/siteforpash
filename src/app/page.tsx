@@ -18,21 +18,17 @@ export default async function HomePage() {
       <main>
         <section className="hero-section">
           <div className="site-container hero-layout">
-            <div className="hero-photo">
-              <Image
-                alt={content.home.teacherName}
-                src={content.home.avatarUrl}
-                width={420}
-                height={420}
-                priority
-              />
-            </div>
-
             <div className="hero-content">
-              <span className="section-kicker">Репетитор по математике</span>
+              <span className="section-kicker">Field guide no. 01 / ОГЭ математика</span>
               <h1>{content.home.teacherName}</h1>
               <p className="hero-role">{content.home.teacherRole}</p>
-              <p>{content.home.shortBio}</p>
+              <p className="hero-copy">{content.home.shortBio}</p>
+              <div className="hero-proof" aria-label="Ключевые принципы подготовки">
+                <span>Диагностика</span>
+                <span>Маршрут</span>
+                <span>Практика</span>
+                <span>Разбор ошибок</span>
+              </div>
               <div className="cta-row">
                 <a href={content.settings.messengers.telegramUrl} target="_blank" rel="noreferrer">
                   <Send size={19} />
@@ -44,24 +40,42 @@ export default async function HomePage() {
                 </a>
               </div>
             </div>
+
+            <div className="hero-specimen" aria-label="Профиль преподавателя">
+              <div className="hero-photo">
+                <Image
+                  alt={content.home.teacherName}
+                  src={content.home.avatarUrl}
+                  width={520}
+                  height={520}
+                  priority
+                />
+              </div>
+              <div className="formula-strip" aria-hidden="true">
+                <span>x^2 + y^2</span>
+                <span>sin a</span>
+                <span>N17</span>
+                <span>90+</span>
+              </div>
+            </div>
           </div>
         </section>
 
         <section className="content-section">
           <div className="site-container section-heading">
             <div>
-              <span className="section-kicker">Структура и описание</span>
-              <h2>Все важное для подготовки в одном месте</h2>
+              <span className="section-kicker">Система подготовки</span>
+              <h2>Не набор уроков, а навигационная карта к экзамену</h2>
             </div>
             <Link className="text-link" href="/articles">
-              Перейти к статьям
+              Открыть журнал
               <ArrowRight size={18} />
             </Link>
           </div>
 
           <div className="site-container home-grid">
-            {visibleBlocks.map((block) => (
-              <InfoTile key={block.id} block={block} />
+            {visibleBlocks.map((block, index) => (
+              <InfoTile key={block.id} block={block} index={index + 1} />
             ))}
           </div>
         </section>
@@ -70,12 +84,12 @@ export default async function HomePage() {
           <section className="content-section video-section">
             <div className="site-container video-layout">
               <div>
-                <span className="section-kicker">Видео-блок</span>
+                <span className="section-kicker">Вводный разбор</span>
                 <h2>{content.video.title}</h2>
                 <p>{content.video.description}</p>
               </div>
               <div className="site-video-frame">
-                <Image alt="" src={content.video.posterUrl} width={860} height={480} />
+                <Image alt="" src={content.video.posterUrl} width={960} height={540} />
                 <span className="play-button">
                   <Play fill="currentColor" size={30} />
                 </span>
@@ -88,9 +102,10 @@ export default async function HomePage() {
   );
 }
 
-function InfoTile({ block }: { block: InfoBlock }) {
+function InfoTile({ block, index }: { block: InfoBlock; index: number }) {
   const content = (
     <>
+      <span className="card-index">{String(index).padStart(2, "0")}</span>
       <span className="tile-icon">
         <AppIcon name={block.icon} />
       </span>
