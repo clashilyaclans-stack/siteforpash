@@ -105,8 +105,20 @@ export function AdminApp({ initialContent, supabaseConfigured }: AdminAppProps) 
       return;
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedPassword = password.trim();
+
+    if (!normalizedEmail || !normalizedPassword) {
+      setStatus("Введите email и пароль.");
+      return;
+    }
+
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setStatus("Входим...");
+    const { error } = await supabase.auth.signInWithPassword({
+      email: normalizedEmail,
+      password: normalizedPassword
+    });
     setBusy(false);
 
     if (error) {
@@ -181,8 +193,13 @@ export function AdminApp({ initialContent, supabaseConfigured }: AdminAppProps) 
             Email
             <input
               autoComplete="email"
+              autoCapitalize="none"
+              autoCorrect="off"
+              inputMode="email"
+              name="email"
               onChange={(event) => setEmail(event.target.value)}
               placeholder="owner@mail.ru"
+              spellCheck={false}
               type="email"
               value={email}
             />
@@ -191,16 +208,20 @@ export function AdminApp({ initialContent, supabaseConfigured }: AdminAppProps) 
             Пароль
             <input
               autoComplete="current-password"
+              autoCapitalize="none"
+              autoCorrect="off"
+              name="password"
               onChange={(event) => setPassword(event.target.value)}
               placeholder="Пароль"
+              spellCheck={false}
               type="password"
               value={password}
             />
           </label>
           <button className="admin-primary" disabled={busy} type="submit">
-            Войти
+            {busy ? "Входим..." : "Войти"}
           </button>
-          <span className="admin-status">{status}</span>
+          <span className="admin-status" role="status" aria-live="polite">{status}</span>
         </form>
       </main>
     );
