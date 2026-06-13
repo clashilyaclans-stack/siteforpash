@@ -25,6 +25,23 @@ export function getFallbackContent(): SiteContent {
         secondaryLabel: "Записаться на консультацию"
       }
     },
+    ui: {
+      adminNavLabel: "Админка",
+      homeHeroBadge: "Field guide no. 01 / ОГЭ математика",
+      homeProofItems: ["Диагностика", "Маршрут", "Практика", "Разбор ошибок"],
+      heroCardLabel: "MATH FIELD CARD",
+      heroFormulaItems: ["x^2 + y^2", "sin a", "N17", "90+"],
+      homeSectionBadge: "Система подготовки",
+      homeSectionTitle: "Не набор уроков, а навигационная карта к экзамену",
+      homeArticlesLinkLabel: "Открыть журнал",
+      videoBadge: "Вводный разбор",
+      articlesBackLabel: "На главную",
+      articlesBadge: "Journal / exam notes",
+      articleReadLabel: "Читать полностью",
+      articleBackToListLabel: "Назад к журналу",
+      articleBackHomeLabel: "Главная",
+      articleDetailBadgePrefix: "Разбор"
+    },
     pages: [
       page("home", "/", "Главная", "Павел Мингайло", "Репетитор по математике", 1),
       page("articles", "/articles", "Статьи", "Полевой журнал подготовки", "Материалы для ОГЭ", 2)

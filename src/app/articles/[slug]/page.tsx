@@ -17,6 +17,7 @@ type ArticlePageProps = {
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { slug } = await params;
   const content = await getSiteContent();
+  const ui = content.ui;
   const article = getArticle(content, slug);
 
   if (!article) {
@@ -32,16 +33,16 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             <div className="article-nav-row">
               <Link className="back-link" href="/articles">
                 <ArrowLeft size={18} />
-                Назад к журналу
+                {ui.articleBackToListLabel}
               </Link>
               <Link className="back-link" href="/">
                 <Home size={18} />
-                Главная
+                {ui.articleBackHomeLabel}
               </Link>
             </div>
 
             <header className="article-detail-head">
-              <span className="section-kicker">Разбор / {article.date}</span>
+              <span className="section-kicker">{ui.articleDetailBadgePrefix} / {article.date}</span>
               <h1>{article.title}</h1>
               <Image alt="" src={article.imageUrl} width={1120} height={620} priority />
               <p>{article.excerpt}</p>

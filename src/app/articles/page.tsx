@@ -11,6 +11,7 @@ export const revalidate = 0;
 
 export default async function ArticlesPage() {
   const content = await getSiteContent();
+  const ui = content.ui;
   const page = getPage(content, "articles");
   const articles = getVisibleArticles(content);
 
@@ -22,9 +23,9 @@ export default async function ArticlesPage() {
           <div className="site-container page-hero-inner">
             <Link className="back-link" href="/">
               <ArrowLeft size={18} />
-              На главную
+              {ui.articlesBackLabel}
             </Link>
-            <span className="section-kicker">Journal / exam notes</span>
+            <span className="section-kicker">{ui.articlesBadge}</span>
             <h1>{page.title}</h1>
             <p>{page.subtitle}</p>
           </div>
@@ -62,7 +63,7 @@ export default async function ArticlesPage() {
                   <Image alt="" src={article.imageUrl} width={700} height={420} />
                   <p>{article.excerpt}</p>
                   <Link className="read-full" href={`/articles/${article.slug}`}>
-                    Читать полностью
+                    {ui.articleReadLabel}
                     <ArrowRight size={18} />
                   </Link>
                 </article>

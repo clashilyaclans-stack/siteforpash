@@ -13,16 +13,19 @@ import {
   Trash2
 } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { getFallbackContent } from "@/lib/fallback-content";
+import { resolveStoredContent } from "@/lib/content";
 import type {
   Article,
   ArticleSection,
   IconName,
   InfoBlock,
   PageConfig,
-  SiteContent
+  SiteContent,
+  SiteUiText
 } from "@/lib/types";
 
-type AdminTab = "homePage" | "articlesPage" | "articleItems" | "contacts" | "settings";
+type AdminTab = "homePage" | "articlesPage" | "articleItems" | "ui" | "contacts" | "settings";
 
 type AdminAppProps = {
   initialContent: SiteContent;
@@ -33,6 +36,7 @@ const tabs: { key: AdminTab; label: string }[] = [
   { key: "homePage", label: "Главная" },
   { key: "articlesPage", label: "Страница статей" },
   { key: "articleItems", label: "Статьи" },
+  { key: "ui", label: "Кнопки и плашки" },
   { key: "contacts", label: "Контакты" },
   { key: "settings", label: "Настройки" }
 ];
@@ -79,7 +83,7 @@ export function AdminApp({ initialContent, supabaseConfigured }: AdminAppProps) 
     }
 
     if (data?.content && Object.keys(data.content as object).length) {
-      setContent(data.content as SiteContent);
+      setContent(resolveStoredContent(data.content, getFallbackContent()));
       setStatus("Контент загружен из Supabase.");
     }
   }, [supabase]);
@@ -275,6 +279,9 @@ export function AdminApp({ initialContent, supabaseConfigured }: AdminAppProps) 
         ) : null}
         {activeTab === "articleItems" ? (
           <ArticlesEditor content={content} setContent={setContent} uploadImage={uploadImage} />
+        ) : null}
+        {activeTab === "ui" ? (
+          <UiTextEditor content={content} setContent={setContent} />
         ) : null}
         {activeTab === "contacts" ? (
           <ContactsEditor content={content} setContent={setContent} />
@@ -583,6 +590,48 @@ function ImportantEditor({ content, setContent }: EditorProps) {
   );
 }
 
+function UiTextEditor({ content, setContent }: EditorProps) {
+  const ui = content.ui;
+
+  return (
+    <div className="admin-stack">
+      <AdminSectionTitle
+        title="Кнопки и плашки сайта"
+        text="Все короткие подписи, бейджи, плашки и навигационные кнопки, которые видны на публичном сайте."
+      />
+      <article className="admin-edit-card">
+        <div className="admin-card-head">
+          <strong>Шапка и главная</strong>
+        </div>
+        <div className="admin-form-grid">
+          <TextField label="Ссылка на админку в меню" value={ui.adminNavLabel} onChange={(value) => updateUi(setContent, { adminNavLabel: value })} />
+          <TextField label="Верхняя плашка hero" value={ui.homeHeroBadge} onChange={(value) => updateUi(setContent, { homeHeroBadge: value })} />
+          <TextField label="Плашки под описанием, каждая с новой строки" textarea value={ui.homeProofItems.join("\n")} onChange={(value) => updateUi(setContent, { homeProofItems: linesToItems(value) })} />
+          <TextField label="Подпись карточки с фото" value={ui.heroCardLabel} onChange={(value) => updateUi(setContent, { heroCardLabel: value })} />
+          <TextField label="Нижние плашки карточки, каждая с новой строки" textarea value={ui.heroFormulaItems.join("\n")} onChange={(value) => updateUi(setContent, { heroFormulaItems: linesToItems(value) })} />
+          <TextField label="Плашка над блоками" value={ui.homeSectionBadge} onChange={(value) => updateUi(setContent, { homeSectionBadge: value })} />
+          <TextField label="Заголовок над блоками" textarea value={ui.homeSectionTitle} onChange={(value) => updateUi(setContent, { homeSectionTitle: value })} />
+          <TextField label="Кнопка перехода к журналу" value={ui.homeArticlesLinkLabel} onChange={(value) => updateUi(setContent, { homeArticlesLinkLabel: value })} />
+          <TextField label="Плашка у видео" value={ui.videoBadge} onChange={(value) => updateUi(setContent, { videoBadge: value })} />
+        </div>
+      </article>
+      <article className="admin-edit-card">
+        <div className="admin-card-head">
+          <strong>Статьи и навигация</strong>
+        </div>
+        <div className="admin-form-grid">
+          <TextField label="Кнопка назад на странице статей" value={ui.articlesBackLabel} onChange={(value) => updateUi(setContent, { articlesBackLabel: value })} />
+          <TextField label="Плашка страницы статей" value={ui.articlesBadge} onChange={(value) => updateUi(setContent, { articlesBadge: value })} />
+          <TextField label="Кнопка карточки статьи" value={ui.articleReadLabel} onChange={(value) => updateUi(setContent, { articleReadLabel: value })} />
+          <TextField label="Кнопка назад внутри статьи" value={ui.articleBackToListLabel} onChange={(value) => updateUi(setContent, { articleBackToListLabel: value })} />
+          <TextField label="Кнопка главной внутри статьи" value={ui.articleBackHomeLabel} onChange={(value) => updateUi(setContent, { articleBackHomeLabel: value })} />
+          <TextField label="Префикс плашки внутри статьи" value={ui.articleDetailBadgePrefix} onChange={(value) => updateUi(setContent, { articleDetailBadgePrefix: value })} />
+        </div>
+      </article>
+    </div>
+  );
+}
+
 function ContactsEditor({ content, setContent }: EditorProps) {
   const messengers = content.settings.messengers;
 
@@ -765,6 +814,13 @@ function updateMessengers(
   }));
 }
 
+function updateUi(setContent: EditorProps["setContent"], patch: Partial<SiteUiText>) {
+  setContent((current) => ({
+    ...current,
+    ui: { ...current.ui, ...patch }
+  }));
+}
+
 function updateInfoBlock(
   setContent: EditorProps["setContent"],
   id: string,
@@ -921,4 +977,13 @@ function slugify(value: string) {
     .toLowerCase()
     .replace(/[^a-z0-9а-яё]+/gi, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+function linesToItems(value: string) {
+  const items = value
+    .split("\n")
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  return items.length ? items : [""];
 }

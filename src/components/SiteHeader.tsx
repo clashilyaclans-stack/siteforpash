@@ -26,7 +26,7 @@ export function SiteHeader({ content }: { content: SiteContent }) {
           })}
           <Link href="/studio-panel-2026">
             <Settings size={17} />
-            Админка
+            {content.ui.adminNavLabel}
           </Link>
         </nav>
       </div>

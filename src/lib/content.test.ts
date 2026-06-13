@@ -10,6 +10,7 @@ describe("site content model", () => {
     expect(content.infoBlocks).toHaveLength(4);
     expect(content.video.title).toBeTruthy();
     expect(content.important.visible).toBe(true);
+    expect(content.ui.articleReadLabel).toBeTruthy();
     expect(content.articles.length).toBeGreaterThanOrEqual(5);
     expect(content.articles[0].sections.length).toBeGreaterThan(1);
   });
@@ -39,6 +40,17 @@ describe("site content model", () => {
     expect(resolveStoredContent(stored, fallback).settings.siteName).toBe("Saved Name");
     expect(resolveStoredContent({ broken: true }, fallback).settings.siteName).toBe(
       fallback.settings.siteName
+    );
+  });
+
+  it("keeps older stored content usable when global UI labels are missing", () => {
+    const fallback = getFallbackContent();
+    const storedWithoutUi = Object.fromEntries(
+      Object.entries(fallback).filter(([key]) => key !== "ui")
+    );
+
+    expect(resolveStoredContent(storedWithoutUi, fallback).ui.articleReadLabel).toBe(
+      fallback.ui.articleReadLabel
     );
   });
 });

@@ -124,6 +124,24 @@ export type SiteSettings = {
   messengers: MessengerSettings;
 };
 
+export type SiteUiText = {
+  adminNavLabel: string;
+  homeHeroBadge: string;
+  homeProofItems: string[];
+  heroCardLabel: string;
+  heroFormulaItems: string[];
+  homeSectionBadge: string;
+  homeSectionTitle: string;
+  homeArticlesLinkLabel: string;
+  videoBadge: string;
+  articlesBackLabel: string;
+  articlesBadge: string;
+  articleReadLabel: string;
+  articleBackToListLabel: string;
+  articleBackHomeLabel: string;
+  articleDetailBadgePrefix: string;
+};
+
 export type HomeContent = {
   teacherName: string;
   teacherRole: string;
@@ -156,6 +174,7 @@ export type Article = {
 
 export type SiteContent = {
   settings: SiteSettings;
+  ui: SiteUiText;
   pages: PageConfig[];
   home: HomeContent;
   infoBlocks: InfoBlock[];

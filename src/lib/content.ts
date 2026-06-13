@@ -45,7 +45,28 @@ export function resolveStoredContent(
     return fallback;
   }
 
-  return candidate as SiteContent;
+  return {
+    ...fallback,
+    ...candidate,
+    settings: {
+      ...fallback.settings,
+      ...candidate.settings,
+      messengers: {
+        ...fallback.settings.messengers,
+        ...candidate.settings.messengers
+      }
+    },
+    ui: {
+      ...fallback.ui,
+      ...(isRecord(candidate.ui) ? candidate.ui : {})
+    },
+    pages: candidate.pages as SiteContent["pages"],
+    home: candidate.home as SiteContent["home"],
+    infoBlocks: candidate.infoBlocks as SiteContent["infoBlocks"],
+    video: candidate.video as SiteContent["video"],
+    important: candidate.important as SiteContent["important"],
+    articles: candidate.articles as SiteContent["articles"]
+  };
 }
 
 export function getVisiblePages(content: SiteContent): PageConfig[] {

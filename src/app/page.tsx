@@ -11,6 +11,7 @@ export const revalidate = 0;
 
 export default async function HomePage() {
   const content = await getSiteContent();
+  const ui = content.ui;
   const visibleBlocks = [...content.infoBlocks]
     .filter((block) => block.visible)
     .sort((left, right) => left.order - right.order);
@@ -22,15 +23,14 @@ export default async function HomePage() {
         <section className="hero-section">
           <div className="site-container hero-layout">
             <div className="hero-content">
-              <span className="section-kicker">Field guide no. 01 / ОГЭ математика</span>
+              <span className="section-kicker">{ui.homeHeroBadge}</span>
               <h1>{content.home.teacherName}</h1>
               <p className="hero-role">{content.home.teacherRole}</p>
               <p className="hero-copy">{content.home.shortBio}</p>
               <div className="hero-proof" aria-label="Ключевые принципы подготовки">
-                <span>Диагностика</span>
-                <span>Маршрут</span>
-                <span>Практика</span>
-                <span>Разбор ошибок</span>
+                {ui.homeProofItems.map((item) => (
+                  <span key={item}>{item}</span>
+                ))}
               </div>
               <div className="cta-row">
                 <a href={content.settings.messengers.telegramUrl} target="_blank" rel="noreferrer">
@@ -45,6 +45,7 @@ export default async function HomePage() {
             </div>
 
             <div className="hero-specimen" aria-label="Профиль преподавателя">
+              <span className="hero-card-label">{ui.heroCardLabel}</span>
               <div className="hero-photo">
                 <Image
                   alt={content.home.teacherName}
@@ -55,10 +56,9 @@ export default async function HomePage() {
                 />
               </div>
               <div className="formula-strip" aria-hidden="true">
-                <span>x^2 + y^2</span>
-                <span>sin a</span>
-                <span>N17</span>
-                <span>90+</span>
+                {ui.heroFormulaItems.map((item) => (
+                  <span key={item}>{item}</span>
+                ))}
               </div>
             </div>
           </div>
@@ -67,11 +67,11 @@ export default async function HomePage() {
         <section className="content-section">
           <div className="site-container section-heading">
             <div>
-              <span className="section-kicker">Система подготовки</span>
-              <h2>Не набор уроков, а навигационная карта к экзамену</h2>
+              <span className="section-kicker">{ui.homeSectionBadge}</span>
+              <h2>{ui.homeSectionTitle}</h2>
             </div>
             <Link className="text-link" href="/articles">
-              Открыть журнал
+              {ui.homeArticlesLinkLabel}
               <ArrowRight size={18} />
             </Link>
           </div>
@@ -87,7 +87,7 @@ export default async function HomePage() {
           <section className="content-section video-section">
             <div className="site-container video-layout">
               <div>
-                <span className="section-kicker">Вводный разбор</span>
+                <span className="section-kicker">{ui.videoBadge}</span>
                 <h2>{content.video.title}</h2>
                 <p>{content.video.description}</p>
               </div>

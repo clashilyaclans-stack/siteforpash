@@ -303,8 +303,7 @@ img {
   overflow: hidden;
 }
 
-.hero-specimen::before {
-  content: "MATH FIELD CARD";
+.hero-card-label {
   position: absolute;
   left: 20px;
   top: 18px;
@@ -312,6 +311,7 @@ img {
   font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 700;
+  z-index: 2;
 }
 
 .hero-specimen::after {
