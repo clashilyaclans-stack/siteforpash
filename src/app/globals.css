@@ -878,8 +878,7 @@ img {
   color: #ffffff;
 }
 
-.card-arrow,
-.article-plus {
+.card-arrow {
   color: rgba(255, 255, 255, 0.86);
 }
 
@@ -1052,11 +1051,11 @@ img {
 }
 
 .article-card-head {
-  grid-template-columns: 42px minmax(0, 1fr) auto;
+  grid-template-columns: 42px minmax(0, 1fr);
 }
 
 .article-card.no-icon .article-card-head {
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .article-card h2 {
@@ -1687,11 +1686,11 @@ img {
   }
 
   .article-card-head {
-    grid-template-columns: 42px minmax(0, 1fr) auto;
+    grid-template-columns: 42px minmax(0, 1fr);
   }
 
   .article-card.no-icon .article-card-head {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .important-card,

@@ -569,7 +569,6 @@ function ArticlesEditor({
           />
           <TextField label="Источники, каждый с новой строки" textarea value={article.sources.join("\n")} onChange={(value) => updateArticle(setContent, article.id, { sources: value.split("\n").filter(Boolean) })} />
           <VisibilityField checked={article.visible} onChange={(visible) => updateArticle(setContent, article.id, { visible })} />
-          <VisibilityField label="Раскрыта в списке" checked={article.expanded} onChange={(expanded) => updateArticle(setContent, article.id, { expanded })} />
           <SectionsEditor article={article} setContent={setContent} uploadImage={uploadImage} />
         </article>
       ))}

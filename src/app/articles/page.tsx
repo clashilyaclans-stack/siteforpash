@@ -1,7 +1,6 @@
 import type { CSSProperties } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Plus, ShieldAlert } from "lucide-react";
+import { ArrowLeft, ArrowRight, ShieldAlert } from "lucide-react";
 import { AppIcon } from "@/components/AppIcon";
 import { getPage, getSiteContent, getVisibleArticles } from "@/lib/content";
 
@@ -58,25 +57,12 @@ export default async function ArticlesPage() {
                       <h2>{article.title}</h2>
                       <time>{article.date}</time>
                     </div>
-                    <Plus className="article-plus" size={20} />
                   </div>
-                  {article.expanded ? (
-                    <>
-                      <p>{article.excerpt}</p>
-                      {article.imageUrl ? (
-                        <Image alt="" src={article.imageUrl} width={700} height={420} />
-                      ) : null}
-                      <Link className="read-full" href={`/articles/${article.slug}`}>
-                        {ui.articleReadLabel}
-                        <ArrowRight size={18} />
-                      </Link>
-                    </>
-                  ) : (
-                    <Link className="read-full compact" href={`/articles/${article.slug}`}>
-                      {ui.articleReadLabel}
-                      <ArrowRight size={18} />
-                    </Link>
-                  )}
+                  <p>{article.excerpt}</p>
+                  <Link className="read-full" href={`/articles/${article.slug}`}>
+                    {ui.articleReadLabel}
+                    <ArrowRight size={18} />
+                  </Link>
                 </article>
               ))}
             </div>
