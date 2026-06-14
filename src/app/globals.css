@@ -1074,16 +1074,20 @@ img {
 .read-full {
   width: 100%;
   margin-top: 2px;
+  border-color: rgba(255, 255, 255, 0.72);
+  background: #ffffff;
+  color: color-mix(in srgb, var(--accent) 82%, #00143f 18%);
+  box-shadow: 0 10px 22px rgba(0, 28, 92, 0.16);
 }
 
 .read-full.compact {
-  min-height: 1px;
-  justify-content: flex-start;
-  border: 0;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.88);
-  padding: 2px 0 0 54px;
-  box-shadow: none;
+  min-height: 44px;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background: #ffffff;
+  color: color-mix(in srgb, var(--accent) 82%, #00143f 18%);
+  padding: 10px 13px;
+  box-shadow: 0 10px 22px rgba(0, 28, 92, 0.16);
 }
 
 .article-card.no-icon .read-full.compact {
