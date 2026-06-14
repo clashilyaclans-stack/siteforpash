@@ -127,7 +127,14 @@ function VideoTile({ badge, video }: { badge: string; video: VideoBlock }) {
       </div>
       <div className="embedded-video">
         {video.videoUrl ? (
-          <video controls preload="metadata" src={video.videoUrl} />
+          <>
+            <video aria-label={video.title} controls playsInline preload="auto">
+              <source src={video.videoUrl} type="video/mp4" />
+            </video>
+            <a className="video-open-link" href={video.videoUrl} target="_blank" rel="noreferrer">
+              Открыть видео
+            </a>
+          </>
         ) : (
           <>
             <span className="play-button">

@@ -920,6 +920,25 @@ img {
   filter: brightness(0.86) saturate(0.96);
 }
 
+.video-open-link {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 2;
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: color-mix(in srgb, var(--accent) 82%, #00143f 18%);
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 900;
+  box-shadow: 0 10px 22px rgba(0, 18, 62, 0.22);
+}
+
 .play-button {
   width: 58px;
   height: 58px;
