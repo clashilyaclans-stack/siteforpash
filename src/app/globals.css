@@ -1708,31 +1708,9 @@ img {
 @media (min-width: 900px) {
   .app-screen {
     padding:
-      56px
-      max(48px, calc((100vw - 1180px) / 2 + 48px))
-      64px;
-  }
-
-  .home-screen {
-    display: grid;
-    grid-template-columns: minmax(280px, 360px) minmax(0, 720px);
-    gap: 18px 44px;
-    align-content: start;
-    align-items: start;
-  }
-
-  .home-screen .profile-head {
-    position: sticky;
-    top: 48px;
-    grid-column: 1;
-    width: 100% !important;
-    max-width: 360px !important;
-    margin: 0 !important;
-    padding: 34px 18px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 22px;
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 18px 44px rgba(0, 35, 120, 0.16);
+      42px
+      max(24px, calc((100vw - 620px) / 2))
+      54px;
   }
 
   .home-screen .profile-head img {
@@ -1745,27 +1723,24 @@ img {
     height: 150px;
   }
 
+  .profile-head,
+  .screen-title,
+  .article-nav-row,
   .home-screen .app-stack,
-  .home-screen .app-actions {
-    grid-column: 2;
+  .home-screen .app-actions,
+  .info-card,
+  .important-card,
+  .article-card,
+  .article-body section,
+  .sources {
     width: 100%;
-    max-width: 720px;
-    justify-self: start;
+    max-width: 620px;
+    margin-right: auto;
+    margin-left: auto;
   }
 
   .home-screen .app-actions {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .home-screen .info-card,
-  .home-screen .important-card,
-  .home-screen .article-card,
-  .home-screen .article-body section,
-  .home-screen .sources {
-    width: 100%;
-    max-width: 100%;
-    margin-right: 0;
-    margin-left: 0;
   }
 
   .articles-screen {
@@ -1781,17 +1756,17 @@ img {
   .article-reader .article-detail-head,
   .article-reader .article-body,
   .article-reader .sources {
-    width: min(100%, 1100px) !important;
-    max-width: 1100px !important;
+    width: 100% !important;
+    max-width: 680px !important;
     margin-right: auto !important;
     margin-left: auto !important;
   }
 
   .article-list {
-    width: min(100%, 1100px);
-    max-width: 1100px;
+    width: 100%;
+    max-width: 620px;
     margin: 0 auto;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .article-card {
@@ -1802,13 +1777,13 @@ img {
   }
 
   .article-card:first-child {
-    grid-column: span 2;
+    grid-column: auto;
   }
 
   .article-reader .article-detail-head,
   .article-reader .article-body,
   .article-reader .sources {
-    max-width: 880px !important;
+    max-width: 680px !important;
   }
 }
 

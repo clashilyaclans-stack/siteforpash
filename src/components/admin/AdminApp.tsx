@@ -142,7 +142,7 @@ export function AdminApp({ initialContent, supabaseConfigured }: AdminAppProps) 
     setStatus("Вы вышли из админки.");
   }
 
-  async function saveContent() {
+  async function persistContent(nextContent: SiteContent) {
     if (!supabase) {
       setStatus("Демо-режим: подключите Supabase, чтобы сохранять изменения онлайн.");
       return;
@@ -151,7 +151,7 @@ export function AdminApp({ initialContent, supabaseConfigured }: AdminAppProps) 
     setBusy(true);
     const { error } = await supabase
       .from("site_content")
-      .upsert({ id: "main", content }, { onConflict: "id" });
+      .upsert({ id: "main", content: nextContent }, { onConflict: "id" });
     setBusy(false);
 
     if (error) {
@@ -162,7 +162,14 @@ export function AdminApp({ initialContent, supabaseConfigured }: AdminAppProps) 
     setStatus("Сохранено. Изменения сразу читаются сайтом из Supabase.");
   }
 
-  async function uploadImage(file: File, onUrl: (url: string) => void) {
+  async function saveContent() {
+    await persistContent(content);
+  }
+
+  async function uploadImage(
+    file: File,
+    applyUrl: (current: SiteContent, url: string) => SiteContent
+  ) {
     if (!supabase) {
       setStatus("Загрузка файлов доступна после подключения Supabase Storage.");
       return;
@@ -183,8 +190,9 @@ export function AdminApp({ initialContent, supabaseConfigured }: AdminAppProps) 
     }
 
     const { data } = supabase.storage.from("site-media").getPublicUrl(path);
-    onUrl(data.publicUrl);
-    setStatus("Файл загружен. Нажмите «Сохранить», чтобы применить.");
+    const nextContent = applyUrl(content, data.publicUrl);
+    setContent(nextContent);
+    await persistContent(nextContent);
   }
 
   if (!isAuthed) {
@@ -300,7 +308,10 @@ type EditorProps = {
   setContent: Dispatch<SetStateAction<SiteContent>>;
 };
 
-type UploadFn = (file: File, onUrl: (url: string) => void) => Promise<void>;
+type UploadFn = (
+  file: File,
+  applyUrl: (current: SiteContent, url: string) => SiteContent
+) => Promise<void>;
 
 function HomePageEditor({
   content,
@@ -423,7 +434,12 @@ function ProfileEditor({
         <ImageField
           label="Аватар"
           value={content.home.avatarUrl}
-          onUpload={(file) => uploadImage(file, (url) => setHome(setContent, { avatarUrl: url }))}
+          onUpload={(file) =>
+            uploadImage(file, (current, url) => ({
+              ...current,
+              home: { ...current.home, avatarUrl: url }
+            }))
+          }
         />
       </div>
     </article>
@@ -490,7 +506,12 @@ function VideoEditor({
           label="Видеофайл"
           selectedLabel="Видео выбрано"
           value={content.video.videoUrl}
-          onUpload={(file) => uploadImage(file, (url) => setVideo(setContent, { videoUrl: url }))}
+          onUpload={(file) =>
+            uploadImage(file, (current, url) => ({
+              ...current,
+              video: { ...current.video, videoUrl: url }
+            }))
+          }
         />
         <VisibilityField checked={content.video.visible} onChange={(visible) => setVideo(setContent, { visible })} />
       </div>
@@ -537,7 +558,14 @@ function ArticlesEditor({
           <ImageField
             label="Картинка статьи"
             value={article.imageUrl}
-            onUpload={(file) => uploadImage(file, (url) => updateArticle(setContent, article.id, { imageUrl: url }))}
+            onUpload={(file) =>
+              uploadImage(file, (current, url) => ({
+                ...current,
+                articles: current.articles.map((item) =>
+                  item.id === article.id ? { ...item, imageUrl: url } : item
+                )
+              }))
+            }
           />
           <TextField label="Источники, каждый с новой строки" textarea value={article.sources.join("\n")} onChange={(value) => updateArticle(setContent, article.id, { sources: value.split("\n").filter(Boolean) })} />
           <VisibilityField checked={article.visible} onChange={(visible) => updateArticle(setContent, article.id, { visible })} />
@@ -571,7 +599,23 @@ function SectionsEditor({
           <ImageField
             label="Картинка раздела"
             value={section.imageUrl || ""}
-            onUpload={(file) => uploadImage(file, (url) => updateArticleSection(setContent, article.id, section.id, { imageUrl: url }))}
+            onUpload={(file) =>
+              uploadImage(file, (current, url) => ({
+                ...current,
+                articles: current.articles.map((item) =>
+                  item.id === article.id
+                    ? {
+                        ...item,
+                        sections: item.sections.map((sectionItem) =>
+                          sectionItem.id === section.id
+                            ? { ...sectionItem, imageUrl: url }
+                            : sectionItem
+                        )
+                      }
+                    : item
+                )
+              }))
+            }
           />
           <button className="icon-danger" onClick={() => removeArticleSection(setContent, article.id, section.id)} type="button">
             <Trash2 size={18} />
