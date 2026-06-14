@@ -1,9 +1,8 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, ShieldAlert } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus, ShieldAlert } from "lucide-react";
 import { AppIcon } from "@/components/AppIcon";
-import { SiteHeader } from "@/components/SiteHeader";
 import { getPage, getSiteContent, getVisibleArticles } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
@@ -16,23 +15,21 @@ export default async function ArticlesPage() {
   const articles = getVisibleArticles(content);
 
   return (
-    <div className="site-page">
-      <SiteHeader content={content} />
+    <div className="site-page" style={{ "--accent": content.settings.accentColor } as CSSProperties}>
       <main>
-        <section className="page-hero">
-          <div className="site-container page-hero-inner">
-            <Link className="back-link" href="/">
-              <ArrowLeft size={18} />
-              {ui.articlesBackLabel}
-            </Link>
-            <span className="section-kicker">{ui.articlesBadge}</span>
-            <h1>{page.title}</h1>
-            <p>{page.subtitle}</p>
-          </div>
-        </section>
+        <section className="app-section">
+          <div className="site-container app-shell">
+            <section className="app-screen articles-screen" aria-labelledby="articles-title">
+              <Link className="back-link" href="/">
+                <ArrowLeft size={18} />
+                {ui.articlesBackLabel}
+              </Link>
+              <div className="screen-title">
+                {ui.articlesBadge ? <span>{ui.articlesBadge}</span> : null}
+                <h1 id="articles-title">{page.title}</h1>
+                <p>{page.subtitle}</p>
+              </div>
 
-        <section className="content-section">
-          <div className="site-container articles-layout">
             {content.important.visible ? (
               <article className="important-card">
                 <span className="important-icon">
@@ -45,30 +42,43 @@ export default async function ArticlesPage() {
               </article>
             ) : null}
 
-            <div className="articles-grid">
+            <div className="article-list">
               {articles.map((article) => (
-                <article className="article-card" key={article.id}>
+                <article className={`article-card${article.icon === "none" ? " no-icon" : ""}`} key={article.id}>
                   <div className="article-card-head">
-                    <span
-                      className="article-icon"
-                      style={{ "--article-color": article.color } as CSSProperties}
-                    >
-                      <AppIcon name={article.icon} />
-                    </span>
+                    {article.icon !== "none" ? (
+                      <span
+                        className="article-icon"
+                        style={{ "--article-color": article.color } as CSSProperties}
+                      >
+                        <AppIcon name={article.icon} />
+                      </span>
+                    ) : null}
                     <div>
                       <h2>{article.title}</h2>
                       <time>{article.date}</time>
                     </div>
+                    <Plus className="article-plus" size={20} />
                   </div>
-                  <Image alt="" src={article.imageUrl} width={700} height={420} />
-                  <p>{article.excerpt}</p>
-                  <Link className="read-full" href={`/articles/${article.slug}`}>
-                    {ui.articleReadLabel}
-                    <ArrowRight size={18} />
-                  </Link>
+                  {article.expanded ? (
+                    <>
+                      <p>{article.excerpt}</p>
+                      <Image alt="" src={article.imageUrl} width={700} height={420} />
+                      <Link className="read-full" href={`/articles/${article.slug}`}>
+                        {ui.articleReadLabel}
+                        <ArrowRight size={18} />
+                      </Link>
+                    </>
+                  ) : (
+                    <Link className="read-full compact" href={`/articles/${article.slug}`}>
+                      {ui.articleReadLabel}
+                      <ArrowRight size={18} />
+                    </Link>
+                  )}
                 </article>
               ))}
             </div>
+            </section>
           </div>
         </section>
       </main>

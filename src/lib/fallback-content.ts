@@ -1,12 +1,9 @@
 import type { Article, IconName, InfoBlock, SiteContent } from "./types";
 
-const avatarUrl = "/teacher-placeholder.svg";
-const studyDeskUrl =
-  "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1400&q=88";
-const chartsUrl =
-  "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1400&q=88";
-const laptopLessonUrl =
-  "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1400&q=88";
+const avatarUrl = "/reference/teacher.jpg";
+const studyDeskUrl = "/reference/article-book.jpg";
+const chartsUrl = "/reference/article-charts.jpg";
+const laptopLessonUrl = "/reference/video-preview.jpg";
 
 export function getFallbackContent(): SiteContent {
   return {
@@ -27,69 +24,69 @@ export function getFallbackContent(): SiteContent {
     },
     ui: {
       adminNavLabel: "Админка",
-      homeHeroBadge: "Field guide no. 01 / ОГЭ математика",
+      homeHeroBadge: "",
       homeProofItems: ["Диагностика", "Маршрут", "Практика", "Разбор ошибок"],
       heroCardLabel: "MATH FIELD CARD",
       heroFormulaItems: ["x^2 + y^2", "sin a", "N17", "90+"],
       homeSectionBadge: "Система подготовки",
-      homeSectionTitle: "Не набор уроков, а навигационная карта к экзамену",
+      homeSectionTitle: "",
       homeArticlesLinkLabel: "Открыть журнал",
-      videoBadge: "Вводный разбор",
+      videoBadge: "",
       articlesBackLabel: "На главную",
-      articlesBadge: "Journal / exam notes",
+      articlesBadge: "",
       articleReadLabel: "Читать полностью",
       articleBackToListLabel: "Назад к журналу",
       articleBackHomeLabel: "Главная",
-      articleDetailBadgePrefix: "Разбор"
+      articleDetailBadgePrefix: "Разбор",
+      articleSourcesTitle: "Источники"
     },
     pages: [
       page("home", "/", "Главная", "Павел Мингайло", "Репетитор по математике", 1),
-      page("articles", "/articles", "Статьи", "Полевой журнал подготовки", "Материалы для ОГЭ", 2)
+      page("articles", "/articles", "Статьи", "Полезные статьи", "Подборки статей, разборы заданий, теория и практика по подготовке к ОГЭ и ЕГЭ.", 2)
     ],
     home: {
       teacherName: "Павел Мингайло",
       teacherRole: "Репетитор по математике",
       avatarUrl,
-      shortBio:
-        "Собираю подготовку к ОГЭ в ясную систему: диагностика, маршрут, практика, разбор ошибок и спокойное движение к результату."
+      shortBio: ""
     },
     infoBlocks: [
       block(
         "about",
         "info",
-        "Диагностика без тумана",
-        "Сначала определяем пробелы, темп и реальную цель по баллам. У ученика появляется карта подготовки, а не список случайных тем.",
+        "О проекте",
+        "Этот сайт создан, чтобы помочь школьникам эффективно готовиться к экзаменам по математике.",
         1
       ),
       block(
         "goal",
         "target",
-        "Маршрут по неделям",
-        "Каждый блок привязан к результату: что повторить, какие задания решить, где проверить себя и когда усложнять уровень.",
+        "Для чего создан сайт",
+        "Здесь собраны полезные материалы, разборы заданий, инструкции и советы для учеников и родителей.",
         2
       ),
       block(
         "articles",
         "book",
-        "Полевой журнал",
-        "Статьи, разборы заданий и короткие инструкции помогают повторять материал между занятиями.",
-        3,
+        "Полезные статьи",
+        "Подборки статей, разборы заданий, теория и практика по подготовке к ОГЭ и ЕГЭ.",
+        4,
         "/articles",
-        "Открыть статьи"
+        "Полезные статьи"
       ),
       block(
         "help",
         "help",
-        "Связь без барьера",
-        "Если ученик застрял, вопрос не копится до следующего урока. Можно написать и быстро понять, куда двигаться дальше.",
-        4
+        "Что делать, если запутался?",
+        "Если у вас появились вопросы или что-то непонятно — напишите мне. Я всегда на связи!",
+        5
       )
     ],
     video: {
       id: "intro-video",
-      title: "Как устроена подготовка",
+      title: "Видео: как пользоваться сайтом",
       description:
-        "Короткое вводное видео показывает, где лежат материалы, как читать статьи и как использовать сайт между занятиями.",
+        "Посмотрите короткое видео, чтобы быстро узнать, как устроен сайт и где искать нужные материалы.",
       videoUrl: "",
       posterUrl: laptopLessonUrl,
       visible: true,
@@ -107,7 +104,7 @@ export function getFallbackContent(): SiteContent {
         "oge-3-months",
         "Как подготовиться к ОГЭ за 3 месяца",
         "12 июн 2024",
-        "Пошаговый план: диагностика, база, регулярная практика и контроль ошибок без паники в последний месяц.",
+        "Пошаговый план подготовки к ОГЭ по математике с нуля до уверенного результата. Разбираем темы, график, ошибки и полезные ресурсы.",
         "book",
         "#2f80ff",
         studyDeskUrl,
@@ -145,7 +142,7 @@ export function getFallbackContent(): SiteContent {
       ),
       article(
         "task-17",
-        "Разбор задания N17",
+        "Разбор задания №17 (огэ)",
         "24 июн 2024",
         "Как читать условие, выбирать способ решения и проверять ответ в одном из самых коварных заданий ОГЭ.",
         "play",
@@ -178,7 +175,7 @@ export function getFallbackContent(): SiteContent {
       ),
       article(
         "hard-tasks",
-        "Задачи повышенной сложности",
+        "Секреты решения задач повышенной сложности",
         "16 июл 2024",
         "Как не бросать сложную задачу после первого чтения и строить решение по опорным признакам.",
         "book",

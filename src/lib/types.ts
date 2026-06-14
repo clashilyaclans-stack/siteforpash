@@ -5,6 +5,7 @@ export type PageKey =
 export type CardGroup = "catalog" | "results" | "directions" | "featured";
 
 export type IconName =
+  | "none"
   | "info"
   | "target"
   | "video"
@@ -140,6 +141,7 @@ export type SiteUiText = {
   articleBackToListLabel: string;
   articleBackHomeLabel: string;
   articleDetailBadgePrefix: string;
+  articleSourcesTitle: string;
 };
 
 export type HomeContent = {

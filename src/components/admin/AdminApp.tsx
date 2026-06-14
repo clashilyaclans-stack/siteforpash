@@ -42,6 +42,7 @@ const tabs: { key: AdminTab; label: string }[] = [
 ];
 
 const iconOptions: IconName[] = [
+  "none",
   "info",
   "target",
   "video",
@@ -163,7 +164,7 @@ export function AdminApp({ initialContent, supabaseConfigured }: AdminAppProps) 
 
   async function uploadImage(file: File, onUrl: (url: string) => void) {
     if (!supabase) {
-      setStatus("Загрузка фото доступна после подключения Supabase Storage.");
+      setStatus("Загрузка файлов доступна после подключения Supabase Storage.");
       return;
     }
 
@@ -177,13 +178,13 @@ export function AdminApp({ initialContent, supabaseConfigured }: AdminAppProps) 
     setBusy(false);
 
     if (error) {
-      setStatus(`Фото не загружено: ${error.message}`);
+      setStatus(`Файл не загружен: ${error.message}`);
       return;
     }
 
     const { data } = supabase.storage.from("site-media").getPublicUrl(path);
     onUrl(data.publicUrl);
-    setStatus("Фото загружено. Нажмите «Сохранить», чтобы применить.");
+    setStatus("Файл загружен. Нажмите «Сохранить», чтобы применить.");
   }
 
   if (!isAuthed) {
@@ -455,6 +456,9 @@ function BlocksEditor({ content, setContent }: EditorProps) {
             <TextField label="Текст" textarea value={block.description} onChange={(value) => updateInfoBlock(setContent, block.id, { description: value })} />
             <div className="admin-inline">
               <TextField label="Ссылка" value={block.href || ""} onChange={(value) => updateInfoBlock(setContent, block.id, { href: value })} />
+              <TextField label="Подпись ссылки / кнопки" value={block.ctaLabel || ""} onChange={(value) => updateInfoBlock(setContent, block.id, { ctaLabel: value })} />
+            </div>
+            <div className="admin-inline">
               <TextField label="Порядок" value={String(block.order)} onChange={(value) => updateInfoBlock(setContent, block.id, { order: Number(value) || 1 })} />
             </div>
             <VisibilityField checked={block.visible} onChange={(visible) => updateInfoBlock(setContent, block.id, { visible })} />
@@ -478,7 +482,16 @@ function VideoEditor({
       <div className="admin-form-grid">
         <TextField label="Заголовок видео" value={content.video.title} onChange={(value) => setVideo(setContent, { title: value })} />
         <TextField label="Ссылка на видео" value={content.video.videoUrl} onChange={(value) => setVideo(setContent, { videoUrl: value })} />
+        <TextField label="Порядок видео среди блоков" value={String(content.video.order)} onChange={(value) => setVideo(setContent, { order: Number(value) || 1 })} />
         <TextField label="Описание" textarea value={content.video.description} onChange={(value) => setVideo(setContent, { description: value })} />
+        <ImageField
+          accept="video/*"
+          emptyLabel="Можно выбрать видео с компьютера или телефона"
+          label="Видеофайл"
+          selectedLabel="Видео выбрано"
+          value={content.video.videoUrl}
+          onUpload={(file) => uploadImage(file, (url) => setVideo(setContent, { videoUrl: url }))}
+        />
         <ImageField
           label="Обложка видео"
           value={content.video.posterUrl}
@@ -626,6 +639,7 @@ function UiTextEditor({ content, setContent }: EditorProps) {
           <TextField label="Кнопка назад внутри статьи" value={ui.articleBackToListLabel} onChange={(value) => updateUi(setContent, { articleBackToListLabel: value })} />
           <TextField label="Кнопка главной внутри статьи" value={ui.articleBackHomeLabel} onChange={(value) => updateUi(setContent, { articleBackHomeLabel: value })} />
           <TextField label="Префикс плашки внутри статьи" value={ui.articleDetailBadgePrefix} onChange={(value) => updateUi(setContent, { articleDetailBadgePrefix: value })} />
+          <TextField label="Заголовок источников внутри статьи" value={ui.articleSourcesTitle} onChange={(value) => updateUi(setContent, { articleSourcesTitle: value })} />
         </div>
       </article>
     </div>
@@ -736,19 +750,25 @@ function VisibilityField({
 }
 
 function ImageField({
+  accept = "image/*",
+  emptyLabel = "Можно выбрать фото с телефона",
   label,
   onUpload,
+  selectedLabel = "Фото выбрано",
   value
 }: {
+  accept?: string;
+  emptyLabel?: string;
   label: string;
   onUpload: (file: File) => void;
+  selectedLabel?: string;
   value: string;
 }) {
   return (
     <label className="admin-field image-field">
       <span>{label}</span>
       <input
-        accept="image/*"
+        accept={accept}
         onChange={(event) => {
           const file = event.target.files?.[0];
           if (file) {
@@ -759,7 +779,7 @@ function ImageField({
       />
       <small>
         <ImagePlus size={15} />
-        {value ? "Фото выбрано" : "Можно выбрать фото с телефона"}
+        {value ? selectedLabel : emptyLabel}
       </small>
     </label>
   );

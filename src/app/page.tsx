@@ -1,10 +1,10 @@
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, MessageCircle, Play, Send } from "lucide-react";
+import { ArrowRight, Play } from "lucide-react";
 import { AppIcon } from "@/components/AppIcon";
-import { SiteHeader } from "@/components/SiteHeader";
 import { getSiteContent } from "@/lib/content";
-import type { InfoBlock } from "@/lib/types";
+import type { InfoBlock, VideoBlock } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -15,103 +15,83 @@ export default async function HomePage() {
   const visibleBlocks = [...content.infoBlocks]
     .filter((block) => block.visible)
     .sort((left, right) => left.order - right.order);
+  const homeItems = [
+    ...visibleBlocks.map((block) => ({
+      id: block.id,
+      kind: "block" as const,
+      order: block.order,
+      item: block
+    })),
+    ...(content.video.visible
+      ? [
+          {
+            id: content.video.id,
+            kind: "video" as const,
+            order: content.video.order,
+            item: content.video
+          }
+        ]
+      : [])
+  ].sort((left, right) => {
+    if (left.order === right.order) {
+      return left.kind === "video" ? -1 : 1;
+    }
+
+    return left.order - right.order;
+  });
 
   return (
-    <div className="site-page">
-      <SiteHeader content={content} />
+    <div className="site-page" style={{ "--accent": content.settings.accentColor } as CSSProperties}>
       <main>
-        <section className="hero-section">
-          <div className="site-container hero-layout">
-            <div className="hero-content">
-              <span className="section-kicker">{ui.homeHeroBadge}</span>
-              <h1>{content.home.teacherName}</h1>
-              <p className="hero-role">{content.home.teacherRole}</p>
-              <p className="hero-copy">{content.home.shortBio}</p>
-              <div className="hero-proof" aria-label="Ключевые принципы подготовки">
-                {ui.homeProofItems.map((item) => (
-                  <span key={item}>{item}</span>
-                ))}
-              </div>
-              <div className="cta-row">
-                <a href={content.settings.messengers.telegramUrl} target="_blank" rel="noreferrer">
-                  <Send size={19} />
-                  {content.settings.messengers.primaryLabel}
-                </a>
-                <a href={content.settings.messengers.whatsappUrl} target="_blank" rel="noreferrer">
-                  <MessageCircle size={19} />
-                  {content.settings.messengers.secondaryLabel}
-                </a>
-              </div>
-            </div>
-
-            <div className="hero-specimen" aria-label="Профиль преподавателя">
-              <span className="hero-card-label">{ui.heroCardLabel}</span>
-              <div className="hero-photo">
+        <section className="app-section">
+          <div className="site-container app-shell">
+            <section className="app-screen home-screen" aria-labelledby="home-title">
+              <div className="profile-head">
                 <Image
                   alt={content.home.teacherName}
                   src={content.home.avatarUrl}
-                  width={520}
-                  height={520}
+                  width={180}
+                  height={180}
                   priority
                 />
+                <h1 id="home-title">{content.home.teacherName}</h1>
+                <p>{content.home.teacherRole}</p>
               </div>
-              <div className="formula-strip" aria-hidden="true">
-                {ui.heroFormulaItems.map((item) => (
-                  <span key={item}>{item}</span>
-                ))}
+
+              <div className="app-stack">
+                {homeItems.map((entry) =>
+                  entry.kind === "video" ? (
+                    <VideoTile key={entry.id} video={entry.item as VideoBlock} badge={ui.videoBadge} />
+                  ) : (
+                    <InfoTile key={entry.id} block={entry.item as InfoBlock} />
+                  )
+                )}
               </div>
-            </div>
+
+              <div className="app-actions">
+                <a href={content.settings.messengers.telegramUrl} target="_blank" rel="noreferrer">
+                  {content.settings.messengers.primaryLabel}
+                </a>
+                <a href={content.settings.messengers.whatsappUrl} target="_blank" rel="noreferrer">
+                  {content.settings.messengers.secondaryLabel}
+                </a>
+              </div>
+            </section>
           </div>
         </section>
-
-        <section className="content-section">
-          <div className="site-container section-heading">
-            <div>
-              <span className="section-kicker">{ui.homeSectionBadge}</span>
-              <h2>{ui.homeSectionTitle}</h2>
-            </div>
-            <Link className="text-link" href="/articles">
-              {ui.homeArticlesLinkLabel}
-              <ArrowRight size={18} />
-            </Link>
-          </div>
-
-          <div className="site-container home-grid">
-            {visibleBlocks.map((block, index) => (
-              <InfoTile key={block.id} block={block} index={index + 1} />
-            ))}
-          </div>
-        </section>
-
-        {content.video.visible ? (
-          <section className="content-section video-section">
-            <div className="site-container video-layout">
-              <div>
-                <span className="section-kicker">{ui.videoBadge}</span>
-                <h2>{content.video.title}</h2>
-                <p>{content.video.description}</p>
-              </div>
-              <div className="site-video-frame">
-                <Image alt="" src={content.video.posterUrl} width={960} height={540} />
-                <span className="play-button">
-                  <Play fill="currentColor" size={30} />
-                </span>
-              </div>
-            </div>
-          </section>
-        ) : null}
       </main>
     </div>
   );
 }
 
-function InfoTile({ block, index }: { block: InfoBlock; index: number }) {
+function InfoTile({ block }: { block: InfoBlock }) {
   const content = (
     <>
-      <span className="card-index">{String(index).padStart(2, "0")}</span>
-      <span className="tile-icon">
-        <AppIcon name={block.icon} />
-      </span>
+      {block.icon !== "none" ? (
+        <span className="tile-icon">
+          <AppIcon name={block.icon} />
+        </span>
+      ) : null}
       <div>
         <h3>{block.title}</h3>
         <p>{block.description}</p>
@@ -122,11 +102,38 @@ function InfoTile({ block, index }: { block: InfoBlock; index: number }) {
 
   if (block.href) {
     return (
-      <Link className="info-card clickable" href={block.href}>
+      <Link className={`info-card clickable${block.icon === "none" ? " no-icon" : ""}`} href={block.href}>
         {content}
       </Link>
     );
   }
 
-  return <article className="info-card">{content}</article>;
+  return <article className={`info-card${block.icon === "none" ? " no-icon" : ""}`}>{content}</article>;
+}
+
+function VideoTile({ badge, video }: { badge: string; video: VideoBlock }) {
+  return (
+    <article className="info-card video-card">
+      <span className="tile-icon">
+        <Play size={22} />
+      </span>
+      <div>
+        {badge ? <span className="block-badge">{badge}</span> : null}
+        <h3>{video.title}</h3>
+      </div>
+      <div className="embedded-video">
+        {video.videoUrl ? (
+          <video controls poster={video.posterUrl} preload="metadata" src={video.videoUrl} />
+        ) : (
+          <>
+            <Image alt="" src={video.posterUrl} width={760} height={430} />
+            <span className="play-button">
+              <Play fill="currentColor" size={26} />
+            </span>
+          </>
+        )}
+      </div>
+      <p>{video.description}</p>
+    </article>
+  );
 }

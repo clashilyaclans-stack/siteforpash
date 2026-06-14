@@ -22,6 +22,10 @@ const icons = {
 };
 
 export function AppIcon({ name, size = 22 }: { name: IconName; size?: number }) {
+  if (name === "none") {
+    return null;
+  }
+
   const Icon = icons[name] || Info;
   return <Icon size={size} />;
 }
