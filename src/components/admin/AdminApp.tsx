@@ -1,6 +1,6 @@
 "use client";
 
-import type { Dispatch, FormEvent, SetStateAction } from "react";
+import type { Dispatch, FormEvent, KeyboardEvent, SetStateAction } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
@@ -672,13 +672,56 @@ function UiTextEditor({ content, setContent }: EditorProps) {
           <strong>Статьи и навигация</strong>
         </div>
         <div className="admin-form-grid">
-          <TextField label="Кнопка назад на странице статей" value={ui.articlesBackLabel} onChange={(value) => updateUi(setContent, { articlesBackLabel: value })} />
-          <TextField label="Плашка страницы статей" value={ui.articlesBadge} onChange={(value) => updateUi(setContent, { articlesBadge: value })} />
-          <TextField label="Кнопка карточки статьи" value={ui.articleReadLabel} onChange={(value) => updateUi(setContent, { articleReadLabel: value })} />
-          <TextField label="Кнопка назад внутри статьи" value={ui.articleBackToListLabel} onChange={(value) => updateUi(setContent, { articleBackToListLabel: value })} />
-          <TextField label="Кнопка главной внутри статьи" value={ui.articleBackHomeLabel} onChange={(value) => updateUi(setContent, { articleBackHomeLabel: value })} />
-          <TextField label="Префикс плашки внутри статьи" value={ui.articleDetailBadgePrefix} onChange={(value) => updateUi(setContent, { articleDetailBadgePrefix: value })} />
-          <TextField label="Заголовок источников внутри статьи" value={ui.articleSourcesTitle} onChange={(value) => updateUi(setContent, { articleSourcesTitle: value })} />
+          <TextField
+            hint="Показывается сверху на странице списка статей и ведёт на главную."
+            label="Страница статей: кнопка «На главную»"
+            rows={2}
+            textarea
+            value={ui.articlesBackLabel}
+            onChange={(value) => updateUi(setContent, { articlesBackLabel: value })}
+          />
+          <TextField
+            hint="Небольшая плашка над заголовком страницы статей."
+            label="Страница статей: верхняя плашка"
+            value={ui.articlesBadge}
+            onChange={(value) => updateUi(setContent, { articlesBadge: value })}
+          />
+          <TextField
+            hint="Кнопка внутри карточки статьи, ведёт к полной статье."
+            label="Карточка статьи: кнопка чтения"
+            rows={2}
+            textarea
+            value={ui.articleReadLabel}
+            onChange={(value) => updateUi(setContent, { articleReadLabel: value })}
+          />
+          <TextField
+            hint="Красная кнопка сверху внутри полной статьи, возвращает к списку статей."
+            label="Полная статья: кнопка «Назад к журналу»"
+            rows={2}
+            textarea
+            value={ui.articleBackToListLabel}
+            onChange={(value) => updateUi(setContent, { articleBackToListLabel: value })}
+          />
+          <TextField
+            hint="Красная кнопка сверху внутри полной статьи, ведёт на главную."
+            label="Полная статья: кнопка «Главная»"
+            rows={2}
+            textarea
+            value={ui.articleBackHomeLabel}
+            onChange={(value) => updateUi(setContent, { articleBackHomeLabel: value })}
+          />
+          <TextField
+            hint="Плашка над заголовком полной статьи, рядом с датой."
+            label="Полная статья: префикс плашки"
+            value={ui.articleDetailBadgePrefix}
+            onChange={(value) => updateUi(setContent, { articleDetailBadgePrefix: value })}
+          />
+          <TextField
+            hint="Заголовок блока со списком источников внизу статьи."
+            label="Полная статья: заголовок источников"
+            value={ui.articleSourcesTitle}
+            onChange={(value) => updateUi(setContent, { articleSourcesTitle: value })}
+          />
         </div>
       </article>
     </div>
@@ -724,24 +767,42 @@ function SettingsEditor({ content, setContent }: EditorProps) {
 }
 
 function TextField({
+  hint,
   label,
   onChange,
+  rows,
   textarea = false,
   value
 }: {
+  hint?: string;
   label: string;
   onChange: (value: string) => void;
+  rows?: number;
   textarea?: boolean;
   value: string;
 }) {
+  const stopFieldKeys = (event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    event.stopPropagation();
+  };
+
   return (
     <label className="admin-field">
       <span>{label}</span>
       {textarea ? (
-        <textarea onChange={(event) => onChange(event.target.value)} value={value} />
+        <textarea
+          onChange={(event) => onChange(event.target.value)}
+          onKeyDown={stopFieldKeys}
+          rows={rows}
+          value={value}
+        />
       ) : (
-        <input onChange={(event) => onChange(event.target.value)} value={value} />
+        <input
+          onChange={(event) => onChange(event.target.value)}
+          onKeyDown={stopFieldKeys}
+          value={value}
+        />
       )}
+      {hint ? <small className="admin-field-hint">{hint}</small> : null}
     </label>
   );
 }
@@ -760,7 +821,11 @@ function SelectField({
   return (
     <label className="admin-field">
       <span>{label}</span>
-      <select onChange={(event) => onChange(event.target.value)} value={value}>
+      <select
+        onChange={(event) => onChange(event.target.value)}
+        onKeyDown={(event) => event.stopPropagation()}
+        value={value}
+      >
         {options.map((option) => (
           <option key={option} value={option}>
             {option}
