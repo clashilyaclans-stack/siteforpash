@@ -47,13 +47,17 @@ export default async function HomePage() {
           <div className="site-container app-shell">
             <section className="app-screen home-screen" aria-labelledby="home-title">
               <div className="profile-head">
-                <Image
-                  alt={content.home.teacherName}
-                  src={content.home.avatarUrl}
-                  width={180}
-                  height={180}
-                  priority
-                />
+                {content.home.avatarUrl ? (
+                  <Image
+                    alt={content.home.teacherName}
+                    src={content.home.avatarUrl}
+                    width={180}
+                    height={180}
+                    priority
+                  />
+                ) : (
+                  <span className="avatar-empty" aria-hidden="true" />
+                )}
                 <h1 id="home-title">{content.home.teacherName}</h1>
                 <p>{content.home.teacherRole}</p>
               </div>
@@ -123,10 +127,9 @@ function VideoTile({ badge, video }: { badge: string; video: VideoBlock }) {
       </div>
       <div className="embedded-video">
         {video.videoUrl ? (
-          <video controls poster={video.posterUrl} preload="metadata" src={video.videoUrl} />
+          <video controls preload="metadata" src={video.videoUrl} />
         ) : (
           <>
-            <Image alt="" src={video.posterUrl} width={760} height={430} />
             <span className="play-button">
               <Play fill="currentColor" size={26} />
             </span>

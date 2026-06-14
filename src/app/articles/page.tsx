@@ -63,7 +63,9 @@ export default async function ArticlesPage() {
                   {article.expanded ? (
                     <>
                       <p>{article.excerpt}</p>
-                      <Image alt="" src={article.imageUrl} width={700} height={420} />
+                      {article.imageUrl ? (
+                        <Image alt="" src={article.imageUrl} width={700} height={420} />
+                      ) : null}
                       <Link className="read-full" href={`/articles/${article.slug}`}>
                         {ui.articleReadLabel}
                         <ArrowRight size={18} />

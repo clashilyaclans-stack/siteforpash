@@ -1,9 +1,9 @@
 import type { Article, IconName, InfoBlock, SiteContent } from "./types";
 
-const avatarUrl = "/reference/teacher.jpg";
-const studyDeskUrl = "/reference/article-book.jpg";
-const chartsUrl = "/reference/article-charts.jpg";
-const laptopLessonUrl = "/reference/video-preview.jpg";
+const avatarUrl = "";
+const studyDeskUrl = "";
+const chartsUrl = "";
+const laptopLessonUrl = "";
 
 export function getFallbackContent(): SiteContent {
   return {

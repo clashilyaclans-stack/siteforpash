@@ -44,7 +44,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               <header className="article-detail-head">
                 <span className="section-kicker">{ui.articleDetailBadgePrefix} / {article.date}</span>
                 <h1>{article.title}</h1>
-                <Image alt="" src={article.imageUrl} width={1120} height={620} priority />
+                {article.imageUrl ? (
+                  <Image alt="" src={article.imageUrl} width={1120} height={620} priority />
+                ) : null}
                 <p>{article.excerpt}</p>
               </header>
 

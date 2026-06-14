@@ -492,11 +492,6 @@ function VideoEditor({
           value={content.video.videoUrl}
           onUpload={(file) => uploadImage(file, (url) => setVideo(setContent, { videoUrl: url }))}
         />
-        <ImageField
-          label="Обложка видео"
-          value={content.video.posterUrl}
-          onUpload={(file) => uploadImage(file, (url) => setVideo(setContent, { posterUrl: url }))}
-        />
         <VisibilityField checked={content.video.visible} onChange={(visible) => setVideo(setContent, { visible })} />
       </div>
     </article>
