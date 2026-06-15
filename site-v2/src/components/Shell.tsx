@@ -13,10 +13,10 @@ const nav = [
 export function Header({ logo }: { logo: string }) {
   return (
     <header className="site-header">
-      <Link className="logo" href="/">
+      <Link className="logo" href="/" aria-label="На главную">
         <span>{logo}</span>
       </Link>
-      <nav>
+      <nav aria-label="Основная навигация">
         {nav.map(([label, href]) => (
           <Link href={href} key={href}>
             {label}
@@ -24,11 +24,14 @@ export function Header({ logo }: { logo: string }) {
         ))}
       </nav>
       <div className="header-actions">
-        <Link className="round-link" href="/contacts" aria-label="Telegram">
+        <Link className="round-link" href="https://t.me/" target="_blank" rel="noreferrer" aria-label="Telegram">
           <Send size={17} />
         </Link>
+        <Link className="round-link vk-link" href="https://vk.com/" target="_blank" rel="noreferrer" aria-label="VK">
+          VK
+        </Link>
         <Link className="primary-small" href="/consultation">
-          Записаться
+          Записаться на консультацию
         </Link>
         <ThemeSwitcher />
       </div>

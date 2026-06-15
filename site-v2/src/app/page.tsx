@@ -3,13 +3,16 @@ import Link from "next/link";
 import {
   ArrowRight,
   BookOpen,
-  Brain,
-  HeartHandshake,
+  ClipboardList,
+  Compass,
+  Heart,
   Lock,
-  ShieldCheck,
+  Shield,
   Sparkles,
+  Star,
   Target,
-  UserRound
+  UserRound,
+  UsersRound
 } from "lucide-react";
 import { VideoModal } from "@/components/VideoModal";
 import { getContent } from "@/lib/content";
@@ -17,114 +20,185 @@ import { getContent } from "@/lib/content";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+const categories = ["Все статьи", "Профориентация", "Математика", "Саморазвитие", "Полезное", "Для родителей"];
+
 export default async function HomePage() {
   const content = await getContent();
   const latest = content.articles.slice(0, 4);
 
   return (
-    <main>
-      <section className="hero section-pad">
+    <main className="home-reference">
+      <section className="reference-hero" aria-label="Главный экран">
+        <div className="hero-glow" />
         <div className="hero-copy">
-          <span className="eyebrow">Профориентация для школьников и студентов</span>
+          <span className="plain-eyebrow">Профориентация для школьников и студентов</span>
           <h1>
-            {content.heroTitle} <span>{content.heroAccent}</span>
+            Помогаю найти
+            <br />
+            свой путь и выбрать
+            <br />
+            <span>профессию по душе</span>
           </h1>
-          <p>{content.heroText}</p>
+          <p>Профориентация для школьников и студентов. Определяем сильные стороны, интересы и возможности.</p>
           <div className="hero-actions">
             <Link className="primary-action" href="/consultation">
               Записаться на консультацию
-              <ArrowRight size={18} />
             </Link>
             <VideoModal label="Смотреть видео о подходе" title="Видео о подходе" url={content.videoUrl} />
           </div>
         </div>
-        <div className="hero-visual">
+
+        <div className="orbit-field" aria-hidden="true">
+          <div className="orbit-card orbit-card-top">
+            <Compass size={18} />
+            <span>Определимся с направлением</span>
+          </div>
+          <div className="orbit-card orbit-card-right">
+            <Star size={18} />
+            <span>Поймем твои сильные стороны</span>
+          </div>
+          <div className="orbit-card orbit-card-bottom">
+            <ClipboardList size={18} />
+            <span>Составим план действий</span>
+          </div>
+          <Sparkles className="sparkle sparkle-one" size={28} />
+          <Sparkles className="sparkle sparkle-two" size={20} />
+        </div>
+
+        <div className="hero-person">
           <Image
-            alt={content.authorName}
-            src="/images/hero-author.jpg"
+            alt="Наставник проекта"
+            src="/images/hero-author-v3.jpg"
             fill
             priority
-            sizes="(max-width: 900px) 100vw, 48vw"
+            sizes="(max-width: 760px) 70vw, 360px"
           />
-          <div className="float-card top">Определяем направление</div>
-          <div className="float-card mid">Находим сильные стороны</div>
-          <div className="float-card low">Собираем план действий</div>
         </div>
       </section>
 
-      <section className="section-pad split-section">
-        <article className="video-card">
-          <span className="chip">Начните отсюда</span>
+      <section className="start-layout" aria-label="Как пользоваться сайтом и быстрый старт">
+        <article className="reference-video">
+          <span className="small-pill">Начните отсюда</span>
           <h2>Как пользоваться сайтом?</h2>
-          <p>Посмотрите короткое видео, чтобы понять, где искать материалы, как пользоваться кабинетом и как получить максимум пользы.</p>
-          <div className="video-frame">
-            <VideoModal label="Запустить видео" title="Как пользоваться сайтом" url={content.videoUrl} />
+          <p>Посмотрите короткое видео (2-3 минуты), чтобы понять, как получить максимум пользы от сайта.</p>
+          <div className="video-preview">
+            <Image alt="" src="/images/hero-video.jpg" fill sizes="(max-width: 760px) 100vw, 440px" />
+            <div>
+              <strong>Как получить максимум пользы от этого сайта</strong>
+              <VideoModal label="" title="Как пользоваться сайтом" url={content.videoUrl} />
+            </div>
+            <div className="fake-controls">
+              <span />
+              <b>0:00 / 2:35</b>
+              <i />
+              <i />
+              <i />
+            </div>
           </div>
         </article>
-        <article className="quick-start">
-          <span className="chip">Быстрый старт</span>
-          <h2>Выберите, что вам нужно прямо сейчас</h2>
-          <StartCard icon={<BookOpen />} title="Я впервые на сайте" text="Изучите бесплатные материалы и полезные статьи." href="/materials" label="Перейти к материалам" />
-          <StartCard icon={<Lock />} title="Я уже ученик" text="Войдите в кабинет и получите доступ к персональным материалам." href="/cabinet" label="Ввести код доступа" />
-          <StartCard icon={<UserRound />} title="Хочу консультацию" text="Узнайте подробнее о консультации и запишитесь на удобное время." href="/consultation" label="Подробнее" />
+
+        <article className="quick-panel">
+          <h2>Быстрый старт</h2>
+          <p>Выберите, что вам нужно прямо сейчас:</p>
+          <QuickStart
+            icon={<BookOpen />}
+            label="Я впервые на сайте"
+            text="Изучите бесплатные материалы и полезные статьи."
+            href="/materials"
+            action="Перейти к материалам"
+            tone="blue"
+          />
+          <QuickStart
+            icon={<Lock />}
+            label="Я уже ученик"
+            text="Войдите в свой кабинет и получите доступ к персональным материалам."
+            href="/cabinet"
+            action="Ввести код доступа"
+            tone="violet"
+          />
+          <QuickStart
+            icon={<UserRound />}
+            label="Хочу консультацию"
+            text="Узнайте подробнее о консультации и запишитесь на удобное время."
+            href="/consultation"
+            action="Подробнее"
+            tone="orange"
+          />
         </article>
       </section>
 
-      <section className="benefits section-pad">
-        <Benefit icon={<Brain />} title="Индивидуальный подход" text="Учитываем ваши интересы, способности и цель." />
-        <Benefit icon={<Target />} title="Практические рекомендации" text="Конкретные шаги и план для достижения цели." />
-        <Benefit icon={<ShieldCheck />} title="Опыт и экспертиза" text="Помогаем школьникам и студентам находить себя." />
-        <Benefit icon={<HeartHandshake />} title="Поддержка на пути" text="Всегда на связи и готов помочь на каждом этапе." />
+      <section className="benefit-strip" aria-label="Преимущества">
+        <Benefit icon={<UsersRound />} title="Индивидуальный подход" text="Учитываем ваши интересы, способности и цели" />
+        <Benefit icon={<Target />} title="Практические рекомендации" text="Конкретные шаги и план для достижения цели" />
+        <Benefit icon={<Shield />} title="Опыт и экспертиза" text="Помогаю школьникам и студентам найти себя с 2019 года" />
+        <Benefit icon={<Heart />} title="Поддержка на пути" text="Всегда на связи и готов помочь на каждом этапе" />
       </section>
 
-      <section className="materials-preview section-pad">
-        <div className="section-head">
+      <section className="knowledge-panel" aria-label="База знаний">
+        <div className="knowledge-head">
           <div>
-            <span className="chip">База знаний</span>
+            <span className="small-pill">База знаний</span>
             <h2>Актуальные материалы для роста и развития</h2>
           </div>
           <Link className="text-link" href="/materials">
             Смотреть все статьи
-            <ArrowRight size={17} />
+            <ArrowRight size={15} />
           </Link>
         </div>
-        <div className="article-grid">
+        <div className="category-tabs" aria-label="Категории">
+          {categories.map((category, index) => (
+            <button className={index === 0 ? "active" : ""} key={category} type="button">
+              {category}
+            </button>
+          ))}
+        </div>
+        <div className="reference-articles">
           {latest.map((article) => (
-            <Link className="article-card" href={`/materials/${article.slug}`} key={article.slug}>
-              <Image alt="" src={article.image} width={520} height={320} />
+            <Link className="reference-article" href={`/materials/${article.slug}`} key={article.slug}>
+              <Image alt="" src={article.image} width={330} height={190} />
               <span>{article.category}</span>
               <h3>{article.title}</h3>
-              <time>{article.date}</time>
-              <b>Читать</b>
+              <div>
+                <time>{article.date}</time>
+                <b>
+                  Читать
+                  <ArrowRight size={14} />
+                </b>
+              </div>
             </Link>
           ))}
         </div>
-      </section>
-
-      <section className="cta-band section-pad">
-        <Sparkles size={34} />
-        <div>
-          <h2>Готовы сделать шаг к своей будущей профессии?</h2>
-          <p>Запишитесь на консультацию и получите персональный план действий.</p>
-        </div>
-        <Link className="primary-action" href="/consultation">
-          Записаться на консультацию
-          <ArrowRight size={18} />
-        </Link>
       </section>
     </main>
   );
 }
 
-function StartCard({ href, icon, label, text, title }: { href: string; icon: React.ReactNode; label: string; text: string; title: string }) {
+function QuickStart({
+  action,
+  href,
+  icon,
+  label,
+  text,
+  tone
+}: {
+  action: string;
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+  text: string;
+  tone: "blue" | "orange" | "violet";
+}) {
   return (
-    <Link className="start-card" href={href}>
+    <Link className={`quick-row ${tone}`} href={href}>
       <span>{icon}</span>
       <div>
-        <h3>{title}</h3>
+        <h3>{label}</h3>
         <p>{text}</p>
       </div>
-      <b>{label}<ArrowRight size={17} /></b>
+      <b>
+        {action}
+        <ArrowRight size={16} />
+      </b>
     </Link>
   );
 }
@@ -133,8 +207,10 @@ function Benefit({ icon, text, title }: { icon: React.ReactNode; text: string; t
   return (
     <article>
       <span>{icon}</span>
-      <h3>{title}</h3>
-      <p>{text}</p>
+      <div>
+        <h3>{title}</h3>
+        <p>{text}</p>
+      </div>
     </article>
   );
 }

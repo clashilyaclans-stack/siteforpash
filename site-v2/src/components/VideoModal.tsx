@@ -19,7 +19,7 @@ export function VideoModal({ label, title, url }: { label: string; title: string
               <X size={22} />
             </button>
             {url ? (
-              <video controls playsInline preload="auto">
+              <video controls playsInline preload="metadata">
                 <source src={url} type="video/mp4" />
               </video>
             ) : (
