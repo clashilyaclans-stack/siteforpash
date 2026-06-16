@@ -7,6 +7,18 @@ export const contentId = process.env.SUPABASE_CONTENT_ID || "site-v2";
 export const fallbackContent: SiteContent = {
   brand: "RouteLab",
   logo: "R",
+  navItems: [
+    { label: "Главная", href: "/" },
+    { label: "Материалы", href: "/materials" },
+    { label: "Кабинет", href: "/cabinet" },
+    { label: "Обо мне", href: "/about" },
+    { label: "Контакты", href: "/contacts" }
+  ],
+  footerText: "Профориентация и обучение для школьников и студентов.",
+  headerButtonText: "Записаться",
+  phoneButtonLabel: "Позвонить",
+  menuOpenLabel: "Открыть меню",
+  menuCloseLabel: "Закрыть меню",
   heroTitle: "Помогаю найти свой путь и выбрать",
   heroAccent: "профессию по душе",
   heroText:
@@ -19,12 +31,19 @@ export const fallbackContent: SiteContent = {
     "Посмотрите короткую инструкцию: где искать материалы, как пользоваться кабинетом ученика и как получить максимум пользы от сайта.",
   howImage: "/images/hero-video.jpg",
   howVideoTitle: "Как получить максимум пользы от этого сайта",
+  orbitLabels: ["Определимся с направлением", "Поймем твои сильные стороны", "Составим план действий"],
   authorName: "Павел Мингайло",
   authorRole: "наставник по образовательным траекториям",
   contactName: "Макс",
   contactPhone: "89089771274",
+  contactBadge: "Контакты",
+  contactTitle: "Связь по проекту",
+  contactText: "По всем вопросам пишите или звоните.",
   consultationUrl: "/consultation",
   videoUrl: "",
+  videoPlaceholderText: "Видео можно загрузить позже через админку",
+  quickTitle: "Быстрый старт",
+  quickText: "Выберите, что вам нужно прямо сейчас:",
   quickCards: [
     {
       title: "Я впервые на сайте",
@@ -66,6 +85,64 @@ export const fallbackContent: SiteContent = {
       text: "Всегда на связи и готов помочь на каждом этапе."
     }
   ],
+  aboutBadge: "Обо мне",
+  aboutText:
+    "Помогаю подросткам и студентам увидеть варианты, выбрать направление и собрать понятный план развития.",
+  aboutImage: "/images/hero-author-v3.jpg",
+  aboutCards: [
+    {
+      title: "Опыт",
+      text: "Работаю с учебными маршрутами, профориентацией и подготовкой к образовательным решениям."
+    },
+    {
+      title: "Достижения",
+      text: "Помогаю ученикам переходить от тревоги к понятным действиям и результатам."
+    },
+    {
+      title: "Подход",
+      text: "Не угадываем профессию, а тестируем гипотезы, интересы, навыки и реальные варианты."
+    },
+    {
+      title: "Отзывы",
+      text: "Ученики отмечают спокойную структуру, поддержку и понятный план после консультаций."
+    }
+  ],
+  consultation: {
+    badge: "Консультация",
+    title: "Персональный разбор образовательного маршрута",
+    text:
+      "Формат для тех, кто хочет не просто список профессий, а спокойный и понятный план: что проверить, куда смотреть и какие шаги сделать первыми.",
+    buttonText: "Записаться",
+    buttonHref: "/contacts",
+    items: [
+      "Разберем интересы и сильные стороны",
+      "Определим несколько реалистичных направлений",
+      "Соберем персональный план действий",
+      "Подскажем материалы для самостоятельной работы"
+    ]
+  },
+  materialsPage: {
+    badge: "Бесплатные материалы",
+    title: "База знаний для осознанного выбора",
+    text: "Статьи, инструкции, полезные материалы и видеоматериалы доступны без регистрации.",
+    categories: ["Все статьи", "Профориентация", "Учеба", "Саморазвитие", "Полезное"],
+    readLabel: "Читать",
+    allLabel: "Смотреть все статьи",
+    backLabel: "Назад к материалам"
+  },
+  cabinet: {
+    closedBadge: "Закрытая зона",
+    closedTitle: "Кабинет ученика",
+    closedText: "Введи код доступа, который выдал наставник. После входа откроются персональные материалы.",
+    codeLabel: "Код доступа",
+    codePlaceholder: "Например, IVAN01",
+    loginButton: "Войти",
+    errorText: "Код не найден. Проверьте правильность ввода.",
+    dashboardBadge: "Кабинет ученика",
+    dashboardGreeting: "Привет",
+    dashboardText: "Здесь собраны материалы именно для тебя.",
+    cardButtonText: "Открыть"
+  },
   articles: [
     article(
       "kak-ponyat-professiyu",
@@ -158,6 +235,12 @@ export function normalizeContent(content: Partial<SiteContent>): SiteContent {
     ...content,
     quickCards: Array.isArray(content.quickCards) ? content.quickCards : fallbackContent.quickCards,
     benefits: Array.isArray(content.benefits) ? content.benefits : fallbackContent.benefits,
+    navItems: Array.isArray(content.navItems) ? content.navItems : fallbackContent.navItems,
+    orbitLabels: Array.isArray(content.orbitLabels) ? content.orbitLabels : fallbackContent.orbitLabels,
+    aboutCards: Array.isArray(content.aboutCards) ? content.aboutCards : fallbackContent.aboutCards,
+    consultation: { ...fallbackContent.consultation, ...(content.consultation || {}) },
+    materialsPage: { ...fallbackContent.materialsPage, ...(content.materialsPage || {}) },
+    cabinet: { ...fallbackContent.cabinet, ...(content.cabinet || {}) },
     articles: Array.isArray(content.articles) ? content.articles : fallbackContent.articles,
     students: Array.isArray(content.students) ? content.students : fallbackContent.students
   };

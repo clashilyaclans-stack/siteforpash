@@ -2,7 +2,7 @@
 
 import { ArrowRight, Folder, Gift, Lock, Rocket, Target } from "lucide-react";
 import { useState } from "react";
-import type { Student } from "@/lib/types";
+import type { CabinetContent, Student } from "@/lib/types";
 
 const icons = {
   folder: Folder,
@@ -12,7 +12,7 @@ const icons = {
   target: Target
 };
 
-export function CabinetAccess({ students }: { students: Student[] }) {
+export function CabinetAccess({ cabinet, students }: { cabinet: CabinetContent; students: Student[] }) {
   const [code, setCode] = useState("");
   const [student, setStudent] = useState<Student | null>(null);
   const [error, setError] = useState("");
@@ -22,7 +22,7 @@ export function CabinetAccess({ students }: { students: Student[] }) {
     const found = students.find((item) => item.code.toLowerCase() === code.trim().toLowerCase());
     if (!found) {
       setStudent(null);
-      setError("Код не найден. Проверьте правильность ввода.");
+      setError(cabinet.errorText);
       return;
     }
 
@@ -34,9 +34,9 @@ export function CabinetAccess({ students }: { students: Student[] }) {
     return (
       <section className="cabinet-dashboard">
         <div className="page-title">
-          <span>Кабинет ученика</span>
-          <h1>Привет, {student.name}!</h1>
-          <p>Здесь собраны материалы именно для тебя.</p>
+          <span>{cabinet.dashboardBadge}</span>
+          <h1>{cabinet.dashboardGreeting}, {student.name}!</h1>
+          <p>{cabinet.dashboardText}</p>
         </div>
         <div className="student-grid">
           {student.cards.map((card) => {
@@ -47,7 +47,7 @@ export function CabinetAccess({ students }: { students: Student[] }) {
                 <h2>{card.title}</h2>
                 <p>{card.text}</p>
                 <button type="button">
-                  Открыть
+                  {cabinet.cardButtonText}
                   <ArrowRight size={16} />
                 </button>
               </article>
@@ -61,22 +61,22 @@ export function CabinetAccess({ students }: { students: Student[] }) {
   return (
     <section className="access-panel">
       <div>
-        <span>Закрытая зона</span>
-        <h1>Кабинет ученика</h1>
-        <p>Введи код доступа, который выдал наставник. После входа откроются персональные материалы.</p>
+        <span>{cabinet.closedBadge}</span>
+        <h1>{cabinet.closedTitle}</h1>
+        <p>{cabinet.closedText}</p>
       </div>
       <form onSubmit={submit}>
         <label>
-          Код доступа
+          {cabinet.codeLabel}
           <input
             autoComplete="one-time-code"
             onChange={(event) => setCode(event.target.value)}
-            placeholder="Например, IVAN01"
+            placeholder={cabinet.codePlaceholder}
             value={code}
           />
         </label>
         <button type="submit">
-          Войти
+          {cabinet.loginButton}
           <ArrowRight size={18} />
         </button>
         {error ? <p className="form-error">{error}</p> : null}

@@ -16,9 +16,11 @@ export default async function ContactsPage() {
     <main className="page-shell">
       <section className="contact-layout contact-simple">
         <div>
-          <span className="chip">Контакты</span>
-          <h1>Связь по проекту</h1>
-          <p>По всем вопросам пишите или звоните: {content.contactName}.</p>
+          <span className="chip">{content.contactBadge}</span>
+          <h1>{content.contactTitle}</h1>
+          <p>
+            {content.contactText} {content.contactName}.
+          </p>
         </div>
         <div className="contact-card">
           <strong>{content.contactName}</strong>

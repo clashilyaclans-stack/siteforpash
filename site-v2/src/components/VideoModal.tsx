@@ -3,7 +3,17 @@
 import { Play, X } from "lucide-react";
 import { useState } from "react";
 
-export function VideoModal({ label, title, url }: { label: string; title: string; url: string }) {
+export function VideoModal({
+  label,
+  placeholder,
+  title,
+  url
+}: {
+  label: string;
+  placeholder: string;
+  title: string;
+  url: string;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -25,7 +35,7 @@ export function VideoModal({ label, title, url }: { label: string; title: string
             ) : (
               <div className="video-placeholder">
                 <Play size={44} />
-                <span>Видео можно загрузить позже через Supabase</span>
+                <span>{placeholder}</span>
               </div>
             )}
           </div>

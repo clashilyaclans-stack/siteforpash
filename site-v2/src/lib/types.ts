@@ -33,9 +33,58 @@ export type Benefit = {
   text: string;
 };
 
+export type NavItem = {
+  label: string;
+  href: string;
+};
+
+export type AboutCard = {
+  title: string;
+  text: string;
+};
+
+export type ConsultationContent = {
+  badge: string;
+  title: string;
+  text: string;
+  buttonText: string;
+  buttonHref: string;
+  items: string[];
+};
+
+export type MaterialsContent = {
+  badge: string;
+  title: string;
+  text: string;
+  categories: string[];
+  readLabel: string;
+  allLabel: string;
+  backLabel: string;
+};
+
+export type CabinetContent = {
+  closedBadge: string;
+  closedTitle: string;
+  closedText: string;
+  codeLabel: string;
+  codePlaceholder: string;
+  loginButton: string;
+  errorText: string;
+  dashboardBadge: string;
+  dashboardGreeting: string;
+  dashboardText: string;
+  cardButtonText: string;
+};
+
 export type SiteContent = {
   brand: string;
   logo: string;
+  navItems: NavItem[];
+  footerText: string;
+  headerButtonText: string;
+  phoneButtonLabel: string;
+  menuOpenLabel: string;
+  menuCloseLabel: string;
   heroTitle: string;
   heroAccent: string;
   heroText: string;
@@ -46,14 +95,28 @@ export type SiteContent = {
   howText: string;
   howImage: string;
   howVideoTitle: string;
+  orbitLabels: string[];
   authorName: string;
   authorRole: string;
   contactName: string;
   contactPhone: string;
+  contactBadge: string;
+  contactTitle: string;
+  contactText: string;
   consultationUrl: string;
   videoUrl: string;
+  videoPlaceholderText: string;
   quickCards: QuickCard[];
   benefits: Benefit[];
+  quickTitle: string;
+  quickText: string;
+  aboutBadge: string;
+  aboutText: string;
+  aboutImage: string;
+  aboutCards: AboutCard[];
+  consultation: ConsultationContent;
+  materialsPage: MaterialsContent;
+  cabinet: CabinetContent;
   articles: Article[];
   students: Student[];
 };

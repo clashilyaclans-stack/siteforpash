@@ -2,6 +2,11 @@ import Image from "next/image";
 import { Award, BookOpen, MessageSquareQuote, Route } from "lucide-react";
 import { getContent } from "@/lib/content";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+const icons = [<BookOpen key="book" />, <Award key="award" />, <Route key="route" />, <MessageSquareQuote key="quote" />];
+
 export default async function AboutPage() {
   const content = await getContent();
 
@@ -9,17 +14,18 @@ export default async function AboutPage() {
     <main className="page-shell">
       <section className="about-hero">
         <div>
-          <span className="chip">Обо мне</span>
+          <span className="chip">{content.aboutBadge}</span>
           <h1>{content.authorName}</h1>
-          <p>{content.authorRole}. Помогаю подросткам и студентам увидеть варианты, выбрать направление и собрать понятный план развития.</p>
+          <p>
+            {content.authorRole}. {content.aboutText}
+          </p>
         </div>
-        <Image alt={content.authorName} src="/images/hero-author.jpg" width={720} height={480} priority />
+        <Image alt={content.authorName} src={content.aboutImage} width={720} height={480} priority />
       </section>
       <section className="timeline-grid">
-        <Card icon={<BookOpen />} title="Опыт" text="Работаю с учебными маршрутами, профориентацией и подготовкой к образовательным решениям." />
-        <Card icon={<Award />} title="Достижения" text="Помогаю ученикам переходить от тревоги к понятным действиям и результатам." />
-        <Card icon={<Route />} title="Подход" text="Не угадываем профессию, а тестируем гипотезы, интересы, навыки и реальные варианты." />
-        <Card icon={<MessageSquareQuote />} title="Отзывы" text="Ученики отмечают спокойную структуру, поддержку и понятный план после консультаций." />
+        {content.aboutCards.map((card, index) => (
+          <Card icon={icons[index] || icons[0]} key={`${card.title}-${index}`} text={card.text} title={card.title} />
+        ))}
       </section>
     </main>
   );

@@ -1,15 +1,18 @@
-import type { Metadata } from "next";
 import "./globals.css";
 import { Footer, Header } from "@/components/Shell";
 import { getContent } from "@/lib/content";
 
-export const metadata: Metadata = {
-  title: "RouteLab | Профориентация и обучение",
-  description: "Современная платформа наставника: материалы, кабинет ученика, консультации и база знаний.",
-  icons: {
-    icon: "/favicon.svg"
-  }
-};
+export async function generateMetadata() {
+  const content = await getContent();
+
+  return {
+    title: `${content.brand} | ${content.authorRole}`,
+    description: content.heroText,
+    icons: {
+      icon: "/favicon.svg"
+    }
+  };
+}
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const content = await getContent();
@@ -17,9 +20,24 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="ru" data-theme="dark">
       <body>
-        <Header contactPhone={content.contactPhone} logo={content.logo} />
+        <Header
+          contactPhone={content.contactPhone}
+          headerButtonText={content.headerButtonText}
+          logo={content.logo}
+          menuCloseLabel={content.menuCloseLabel}
+          menuOpenLabel={content.menuOpenLabel}
+          navItems={content.navItems}
+          phoneButtonLabel={content.phoneButtonLabel}
+        />
         {children}
-        <Footer brand={content.brand} contactName={content.contactName} contactPhone={content.contactPhone} logo={content.logo} />
+        <Footer
+          brand={content.brand}
+          contactName={content.contactName}
+          contactPhone={content.contactPhone}
+          footerText={content.footerText}
+          logo={content.logo}
+          navItems={content.navItems}
+        />
       </body>
     </html>
   );

@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-import { contentId, contentTable, fallbackContent, normalizeContent } from "@/lib/content";
+import { contentId, contentTable, fallbackContent, getContent, normalizeContent } from "@/lib/content";
 import type { SiteContent } from "@/lib/types";
 
 function isAdmin(email?: string, password?: string) {
@@ -11,7 +11,7 @@ function isAdmin(email?: string, password?: string) {
 }
 
 export async function GET() {
-  return NextResponse.json({ content: await import("@/lib/content").then((mod) => mod.getContent()) });
+  return NextResponse.json({ content: await getContent() });
 }
 
 export async function POST(request: Request) {

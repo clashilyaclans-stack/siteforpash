@@ -3,22 +3,31 @@
 import Link from "next/link";
 import { Menu, Phone, X } from "lucide-react";
 import { useState } from "react";
+import type { NavItem } from "@/lib/types";
 import { ThemeSwitcher } from "./ThemeSwitcher";
-
-const nav = [
-  ["Главная", "/"],
-  ["Материалы", "/materials"],
-  ["Кабинет", "/cabinet"],
-  ["Обо мне", "/about"],
-  ["Контакты", "/contacts"]
-];
 
 function phoneHref(phone: string) {
   const digits = phone.replace(/\D/g, "");
   return digits.startsWith("8") ? `tel:+7${digits.slice(1)}` : `tel:+${digits}`;
 }
 
-export function Header({ contactPhone, logo }: { contactPhone: string; logo: string }) {
+export function Header({
+  contactPhone,
+  headerButtonText,
+  logo,
+  menuCloseLabel,
+  menuOpenLabel,
+  navItems,
+  phoneButtonLabel
+}: {
+  contactPhone: string;
+  headerButtonText: string;
+  logo: string;
+  menuCloseLabel: string;
+  menuOpenLabel: string;
+  navItems: NavItem[];
+  phoneButtonLabel: string;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -29,7 +38,7 @@ export function Header({ contactPhone, logo }: { contactPhone: string; logo: str
 
       <button
         aria-expanded={open}
-        aria-label={open ? "Закрыть меню" : "Открыть меню"}
+        aria-label={open ? menuCloseLabel : menuOpenLabel}
         className="menu-toggle"
         onClick={() => setOpen((current) => !current)}
         type="button"
@@ -38,7 +47,7 @@ export function Header({ contactPhone, logo }: { contactPhone: string; logo: str
       </button>
 
       <nav aria-label="Основная навигация" className={open ? "open" : ""}>
-        {nav.map(([label, href]) => (
+        {navItems.map(({ label, href }) => (
           <Link href={href} key={href} onClick={() => setOpen(false)}>
             {label}
           </Link>
@@ -46,11 +55,11 @@ export function Header({ contactPhone, logo }: { contactPhone: string; logo: str
       </nav>
 
       <div className="header-actions">
-        <Link className="round-link phone-link" href={phoneHref(contactPhone)} aria-label="Позвонить">
+        <Link className="round-link phone-link" href={phoneHref(contactPhone)} aria-label={phoneButtonLabel}>
           <Phone size={17} />
         </Link>
         <Link className="primary-small" href="/consultation">
-          Записаться
+          {headerButtonText}
         </Link>
         <ThemeSwitcher />
       </div>
@@ -62,12 +71,16 @@ export function Footer({
   brand,
   contactName,
   contactPhone,
-  logo
+  footerText,
+  logo,
+  navItems
 }: {
   brand: string;
   contactName: string;
   contactPhone: string;
+  footerText: string;
   logo: string;
+  navItems: NavItem[];
 }) {
   return (
     <footer className="site-footer">
@@ -75,11 +88,11 @@ export function Footer({
         <Link className="logo" href="/">
           <span>{logo}</span>
         </Link>
-        <p>{brand}. Профориентация и обучение для школьников и студентов.</p>
+        <p>{brand}. {footerText}</p>
       </div>
       <div>
         <strong>Навигация</strong>
-        {nav.map(([label, href]) => (
+        {navItems.map(({ label, href }) => (
           <Link href={href} key={href}>
             {label}
           </Link>

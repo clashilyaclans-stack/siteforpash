@@ -8,7 +8,7 @@ export default async function CabinetPage() {
   const content = await getContent();
   return (
     <main className="page-shell">
-      <CabinetAccess students={content.students} />
+      <CabinetAccess cabinet={content.cabinet} students={content.students} />
     </main>
   );
 }
