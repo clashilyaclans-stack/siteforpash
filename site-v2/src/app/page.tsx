@@ -39,7 +39,6 @@ export default async function HomePage() {
             <Link className="primary-action" href={content.consultationUrl}>
               {content.heroButtonText}
             </Link>
-            <VideoModal label={content.videoButtonText} title="Видео о подходе" url={content.videoUrl} />
           </div>
         </div>
 

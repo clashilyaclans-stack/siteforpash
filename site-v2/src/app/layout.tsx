@@ -17,9 +17,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="ru" data-theme="dark">
       <body>
-        <Header logo={content.logo} />
+        <Header contactPhone={content.contactPhone} logo={content.logo} />
         {children}
-        <Footer brand={content.brand} logo={content.logo} />
+        <Footer brand={content.brand} contactName={content.contactName} contactPhone={content.contactPhone} logo={content.logo} />
       </body>
     </html>
   );

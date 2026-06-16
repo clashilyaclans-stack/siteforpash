@@ -13,6 +13,8 @@ const content = {
   howVideoTitle: "Как получить максимум пользы от этого сайта",
   authorName: "Павел Мингайло",
   authorRole: "Профориентация для школьников и студентов",
+  contactName: "Макс",
+  contactPhone: "89089771274",
   consultationUrl: "/consultation",
   videoUrl: "",
   quickCards: [

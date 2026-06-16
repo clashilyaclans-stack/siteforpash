@@ -21,6 +21,8 @@ export const fallbackContent: SiteContent = {
   howVideoTitle: "Как получить максимум пользы от этого сайта",
   authorName: "Павел Мингайло",
   authorRole: "наставник по образовательным траекториям",
+  contactName: "Макс",
+  contactPhone: "89089771274",
   consultationUrl: "/consultation",
   videoUrl: "",
   quickCards: [

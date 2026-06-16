@@ -1,37 +1,56 @@
+"use client";
+
 import Link from "next/link";
-import { Send } from "lucide-react";
+import { Menu, Phone, X } from "lucide-react";
+import { useState } from "react";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 
 const nav = [
   ["Главная", "/"],
-  ["Бесплатные материалы", "/materials"],
-  ["Кабинет ученика", "/cabinet"],
+  ["Материалы", "/materials"],
+  ["Кабинет", "/cabinet"],
   ["Обо мне", "/about"],
   ["Контакты", "/contacts"]
 ];
 
-export function Header({ logo }: { logo: string }) {
+function phoneHref(phone: string) {
+  const digits = phone.replace(/\D/g, "");
+  return digits.startsWith("8") ? `tel:+7${digits.slice(1)}` : `tel:+${digits}`;
+}
+
+export function Header({ contactPhone, logo }: { contactPhone: string; logo: string }) {
+  const [open, setOpen] = useState(false);
+
   return (
     <header className="site-header">
-      <Link className="logo" href="/" aria-label="На главную">
+      <Link className="logo" href="/" aria-label="На главную" onClick={() => setOpen(false)}>
         <span>{logo}</span>
       </Link>
-      <nav aria-label="Основная навигация">
+
+      <button
+        aria-expanded={open}
+        aria-label={open ? "Закрыть меню" : "Открыть меню"}
+        className="menu-toggle"
+        onClick={() => setOpen((current) => !current)}
+        type="button"
+      >
+        {open ? <X size={22} /> : <Menu size={22} />}
+      </button>
+
+      <nav aria-label="Основная навигация" className={open ? "open" : ""}>
         {nav.map(([label, href]) => (
-          <Link href={href} key={href}>
+          <Link href={href} key={href} onClick={() => setOpen(false)}>
             {label}
           </Link>
         ))}
       </nav>
+
       <div className="header-actions">
-        <Link className="round-link" href="https://t.me/" target="_blank" rel="noreferrer" aria-label="Telegram">
-          <Send size={17} />
-        </Link>
-        <Link className="round-link vk-link" href="https://vk.com/" target="_blank" rel="noreferrer" aria-label="VK">
-          VK
+        <Link className="round-link phone-link" href={phoneHref(contactPhone)} aria-label="Позвонить">
+          <Phone size={17} />
         </Link>
         <Link className="primary-small" href="/consultation">
-          Записаться на консультацию
+          Записаться
         </Link>
         <ThemeSwitcher />
       </div>
@@ -39,7 +58,17 @@ export function Header({ logo }: { logo: string }) {
   );
 }
 
-export function Footer({ brand, logo }: { brand: string; logo: string }) {
+export function Footer({
+  brand,
+  contactName,
+  contactPhone,
+  logo
+}: {
+  brand: string;
+  contactName: string;
+  contactPhone: string;
+  logo: string;
+}) {
   return (
     <footer className="site-footer">
       <div>
@@ -57,16 +86,9 @@ export function Footer({ brand, logo }: { brand: string; logo: string }) {
         ))}
       </div>
       <div>
-        <strong>Материалы</strong>
-        <Link href="/materials">Все статьи</Link>
-        <Link href="/consultation">Консультация</Link>
-        <Link href="/cabinet">Код доступа</Link>
-      </div>
-      <div>
         <strong>Контакты</strong>
-        <a href="mailto:example@mail.com">example@mail.com</a>
-        <a href="https://t.me/" target="_blank" rel="noreferrer">Telegram</a>
-        <a href="https://vk.com/" target="_blank" rel="noreferrer">VK</a>
+        <span>{contactName}</span>
+        <a href={phoneHref(contactPhone)}>{contactPhone}</a>
       </div>
     </footer>
   );

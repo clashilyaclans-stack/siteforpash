@@ -1,25 +1,32 @@
-import { Mail, MessageCircle, Send } from "lucide-react";
+import { Phone } from "lucide-react";
+import { getContent } from "@/lib/content";
 
-export default function ContactsPage() {
+function phoneHref(phone: string) {
+  const digits = phone.replace(/\D/g, "");
+  return digits.startsWith("8") ? `tel:+7${digits.slice(1)}` : `tel:+${digits}`;
+}
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+export default async function ContactsPage() {
+  const content = await getContent();
+
   return (
     <main className="page-shell">
-      <section className="contact-layout">
+      <section className="contact-layout contact-simple">
         <div>
           <span className="chip">Контакты</span>
-          <h1>Свяжитесь удобным способом</h1>
-          <p>Можно написать в Telegram или VK, либо оставить заявку через форму. Я отвечу и помогу выбрать следующий шаг.</p>
-          <div className="contact-links">
-            <a href="https://t.me/" target="_blank" rel="noreferrer"><Send /> Telegram</a>
-            <a href="https://vk.com/" target="_blank" rel="noreferrer"><MessageCircle /> VK</a>
-            <a href="mailto:example@mail.com"><Mail /> example@mail.com</a>
-          </div>
+          <h1>Связь по проекту</h1>
+          <p>По всем вопросам пишите или звоните: {content.contactName}.</p>
         </div>
-        <form className="contact-form">
-          <label>Имя<input placeholder="Ваше имя" /></label>
-          <label>Контакт<input placeholder="Telegram, VK или email" /></label>
-          <label>Сообщение<textarea placeholder="Коротко опишите вопрос" /></label>
-          <button type="button">Отправить заявку</button>
-        </form>
+        <div className="contact-card">
+          <strong>{content.contactName}</strong>
+          <a href={phoneHref(content.contactPhone)}>
+            <Phone size={24} />
+            {content.contactPhone}
+          </a>
+        </div>
       </section>
     </main>
   );

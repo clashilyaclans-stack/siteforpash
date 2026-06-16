@@ -48,6 +48,8 @@ export type SiteContent = {
   howVideoTitle: string;
   authorName: string;
   authorRole: string;
+  contactName: string;
+  contactPhone: string;
   consultationUrl: string;
   videoUrl: string;
   quickCards: QuickCard[];

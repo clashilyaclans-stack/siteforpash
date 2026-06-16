@@ -229,6 +229,8 @@ export function AdminPanel({ initialContent }: { initialContent: SiteContent }) 
               <label>Текст кнопки видео<input value={content.videoButtonText} onChange={(event) => updateContent({ videoButtonText: event.target.value })} /></label>
               <label>Имя автора<input value={content.authorName} onChange={(event) => updateContent({ authorName: event.target.value })} /></label>
               <label>Роль автора<input value={content.authorRole} onChange={(event) => updateContent({ authorRole: event.target.value })} /></label>
+              <label>Контактное имя<input value={content.contactName} onChange={(event) => updateContent({ contactName: event.target.value })} /></label>
+              <label>Телефон<input value={content.contactPhone} onChange={(event) => updateContent({ contactPhone: event.target.value })} /></label>
               <label>Ссылка консультации<input value={content.consultationUrl} onChange={(event) => updateContent({ consultationUrl: event.target.value })} /></label>
               <label>Видео MP4 / ссылка<input value={content.videoUrl} onChange={(event) => updateContent({ videoUrl: event.target.value })} /></label>
               <label>Плашка инструкции<input value={content.howBadge} onChange={(event) => updateContent({ howBadge: event.target.value })} /></label>
