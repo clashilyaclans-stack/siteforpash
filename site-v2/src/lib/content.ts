@@ -1,6 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Article, SiteContent } from "./types";
 
+export const contentTable = process.env.SUPABASE_CONTENT_TABLE || "site_content";
+export const contentId = process.env.SUPABASE_CONTENT_ID || "site-v2";
+
 export const fallbackContent: SiteContent = {
   brand: "RouteLab",
   logo: "R",
@@ -8,10 +11,59 @@ export const fallbackContent: SiteContent = {
   heroAccent: "профессию по душе",
   heroText:
     "Профориентация для школьников и студентов. Определяем сильные стороны, интересы и возможности.",
+  heroButtonText: "Записаться на консультацию",
+  videoButtonText: "Смотреть видео о подходе",
+  howBadge: "Начните отсюда",
+  howTitle: "Как пользоваться сайтом?",
+  howText:
+    "Посмотрите короткую инструкцию: где искать материалы, как пользоваться кабинетом ученика и как получить максимум пользы от сайта.",
+  howImage: "/images/hero-video.jpg",
+  howVideoTitle: "Как получить максимум пользы от этого сайта",
   authorName: "Павел Мингайло",
-  authorRole: "репетитор и наставник по образовательным траекториям",
+  authorRole: "наставник по образовательным траекториям",
   consultationUrl: "/consultation",
   videoUrl: "",
+  quickCards: [
+    {
+      title: "Я впервые на сайте",
+      text: "Изучите бесплатные материалы и полезные статьи.",
+      action: "Перейти к материалам",
+      href: "/materials",
+      tone: "blue"
+    },
+    {
+      title: "Я уже ученик",
+      text: "Войдите в свой кабинет и получите доступ к персональным материалам.",
+      action: "Ввести код доступа",
+      href: "/cabinet",
+      tone: "violet"
+    },
+    {
+      title: "Хочу консультацию",
+      text: "Узнайте подробнее о консультации и запишитесь на удобное время.",
+      action: "Подробнее",
+      href: "/consultation",
+      tone: "orange"
+    }
+  ],
+  benefits: [
+    {
+      title: "Индивидуальный подход",
+      text: "Учитываем ваши интересы, способности и цели."
+    },
+    {
+      title: "Практические рекомендации",
+      text: "Конкретные шаги и план для достижения цели."
+    },
+    {
+      title: "Опыт и экспертиза",
+      text: "Помогаю школьникам и студентам найти себя с 2019 года."
+    },
+    {
+      title: "Поддержка на пути",
+      text: "Всегда на связи и готов помочь на каждом этапе."
+    }
+  ],
   articles: [
     article(
       "kak-ponyat-professiyu",
@@ -58,7 +110,7 @@ export const fallbackContent: SiteContent = {
         },
         {
           icon: "gift",
-          title: "Твоя бесплатная консультация",
+          title: "Бесплатная консультация",
           text: "Подробные рекомендации и разбор твоей ситуации."
         },
         {
@@ -78,7 +130,7 @@ export const fallbackContent: SiteContent = {
 
 export async function getContent(): Promise<SiteContent> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  const key = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
   if (!url || !key) {
     return fallbackContent;
@@ -86,16 +138,27 @@ export async function getContent(): Promise<SiteContent> {
 
   const supabase = createClient(url, key);
   const { data, error } = await supabase
-    .from("site_v2_content")
+    .from(contentTable)
     .select("content")
-    .eq("id", "main")
+    .eq("id", contentId)
     .maybeSingle();
 
   if (error || !data?.content) {
     return fallbackContent;
   }
 
-  return { ...fallbackContent, ...(data.content as Partial<SiteContent>) };
+  return normalizeContent(data.content as Partial<SiteContent>);
+}
+
+export function normalizeContent(content: Partial<SiteContent>): SiteContent {
+  return {
+    ...fallbackContent,
+    ...content,
+    quickCards: Array.isArray(content.quickCards) ? content.quickCards : fallbackContent.quickCards,
+    benefits: Array.isArray(content.benefits) ? content.benefits : fallbackContent.benefits,
+    articles: Array.isArray(content.articles) ? content.articles : fallbackContent.articles,
+    students: Array.isArray(content.students) ? content.students : fallbackContent.students
+  };
 }
 
 export async function getArticle(slug: string): Promise<Article | undefined> {

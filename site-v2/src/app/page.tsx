@@ -28,20 +28,18 @@ export default async function HomePage() {
       <section className="reference-hero" aria-label="Главный экран">
         <div className="hero-glow" />
         <div className="hero-copy">
-          <span className="plain-eyebrow">Профориентация для школьников и студентов</span>
+          <span className="plain-eyebrow">{content.authorRole}</span>
           <h1>
-            Помогаю найти
+            {content.heroTitle}
             <br />
-            свой путь и выбрать
-            <br />
-            <span>профессию по душе</span>
+            <span>{content.heroAccent}</span>
           </h1>
-          <p>Профориентация для школьников и студентов. Определяем сильные стороны, интересы и возможности.</p>
+          <p>{content.heroText}</p>
           <div className="hero-actions">
-            <Link className="primary-action" href="/consultation">
-              Записаться на консультацию
+            <Link className="primary-action" href={content.consultationUrl}>
+              {content.heroButtonText}
             </Link>
-            <VideoModal label="Смотреть видео о подходе" title="Видео о подходе" url={content.videoUrl} />
+            <VideoModal label={content.videoButtonText} title="Видео о подходе" url={content.videoUrl} />
           </div>
         </div>
 
@@ -75,19 +73,18 @@ export default async function HomePage() {
 
       <section className="start-layout" aria-label="Инструкция и быстрый старт">
         <article className="reference-video content-sequence">
-          <span className="small-pill">Начните отсюда</span>
-          <h2>Как пользоваться сайтом?</h2>
+          <span className="small-pill">{content.howBadge}</span>
+          <h2>{content.howTitle}</h2>
           <p>
-            Посмотрите короткую инструкцию: где искать материалы, как пользоваться кабинетом ученика
-            и как получить максимум пользы от сайта.
+            {content.howText}
           </p>
           <figure className="instruction-image">
-            <Image alt="Визуальное вступление к инструкции" src="/images/hero-video.jpg" width={720} height={420} />
+            <Image alt="Визуальное вступление к инструкции" src={content.howImage} width={720} height={420} />
           </figure>
           <div className="video-preview">
-            <Image alt="" src="/images/hero-video.jpg" fill sizes="(max-width: 760px) 100vw, 440px" />
+            <Image alt="" src={content.howImage} fill sizes="(max-width: 760px) 100vw, 440px" />
             <div>
-              <strong>Как получить максимум пользы от этого сайта</strong>
+              <strong>{content.howVideoTitle}</strong>
               <VideoModal label="" title="Как пользоваться сайтом" url={content.videoUrl} />
             </div>
             <div className="fake-controls">
@@ -103,38 +100,29 @@ export default async function HomePage() {
         <article className="quick-panel">
           <h2>Быстрый старт</h2>
           <p>Выберите, что вам нужно прямо сейчас:</p>
-          <QuickStart
-            icon={<BookOpen />}
-            label="Я впервые на сайте"
-            text="Изучите бесплатные материалы и полезные статьи."
-            href="/materials"
-            action="Перейти к материалам"
-            tone="blue"
-          />
-          <QuickStart
-            icon={<Lock />}
-            label="Я уже ученик"
-            text="Войдите в свой кабинет и получите доступ к персональным материалам."
-            href="/cabinet"
-            action="Ввести код доступа"
-            tone="violet"
-          />
-          <QuickStart
-            icon={<UserRound />}
-            label="Хочу консультацию"
-            text="Узнайте подробнее о консультации и запишитесь на удобное время."
-            href="/consultation"
-            action="Подробнее"
-            tone="orange"
-          />
+          {content.quickCards.map((card, index) => (
+            <QuickStart
+              action={card.action}
+              href={card.href}
+              icon={[<BookOpen key="book" />, <Lock key="lock" />, <UserRound key="user" />][index] || <BookOpen />}
+              key={`${card.title}-${index}`}
+              label={card.title}
+              text={card.text}
+              tone={card.tone}
+            />
+          ))}
         </article>
       </section>
 
       <section className="benefit-strip final-home-block" aria-label="Преимущества">
-        <Benefit icon={<UsersRound />} title="Индивидуальный подход" text="Учитываем ваши интересы, способности и цели." />
-        <Benefit icon={<Target />} title="Практические рекомендации" text="Конкретные шаги и план для достижения цели." />
-        <Benefit icon={<Shield />} title="Опыт и экспертиза" text="Помогаю школьникам и студентам найти себя с 2019 года." />
-        <Benefit icon={<Heart />} title="Поддержка на пути" text="Всегда на связи и готов помочь на каждом этапе." />
+        {content.benefits.map((benefit, index) => (
+          <Benefit
+            icon={[<UsersRound key="users" />, <Target key="target" />, <Shield key="shield" />, <Heart key="heart" />][index] || <Heart />}
+            key={`${benefit.title}-${index}`}
+            text={benefit.text}
+            title={benefit.title}
+          />
+        ))}
       </section>
     </main>
   );

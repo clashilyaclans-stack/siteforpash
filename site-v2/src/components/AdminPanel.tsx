@@ -1,210 +1,205 @@
 "use client";
 
-import {
-  ArrowDown,
-  ArrowUp,
-  Eye,
-  EyeOff,
-  FileArchive,
-  FileText,
-  Folder,
-  ImageIcon,
-  Link2,
-  Plus,
-  Save,
-  Settings,
-  Trash2,
-  Video
-} from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { FileText, Lock, Plus, Save, Settings, Trash2, UserRound } from "lucide-react";
+import { useMemo, useState } from "react";
+import type { Article, Benefit, QuickCard, SiteContent, Student } from "@/lib/types";
 
-type CmsBlock = {
-  id: string;
-  section: string;
-  title: string;
-  subtitle: string;
-  text: string;
-  buttonText: string;
-  buttonUrl: string;
-  icon: string;
-  image: string;
-  video: string;
-  file: string;
-  visible: boolean;
-};
+type Tab = "site" | "articles" | "students";
 
-const initialBlocks: CmsBlock[] = [
-  {
-    id: "hero",
-    section: "Главная",
-    title: "Помогаю найти свой путь и выбрать профессию по душе",
-    subtitle: "Профориентация для школьников и студентов",
-    text: "Определяем сильные стороны, интересы и возможности.",
-    buttonText: "Записаться на консультацию",
-    buttonUrl: "/consultation",
-    icon: "Compass",
-    image: "/images/hero-author-v3.jpg",
-    video: "",
-    file: "",
-    visible: true
-  },
-  {
-    id: "how-to",
-    section: "Главная",
-    title: "Как пользоваться сайтом?",
-    subtitle: "Начните отсюда",
-    text: "Текст инструкции. После текста размещается изображение, затем видео и дополнительные материалы.",
-    buttonText: "Запустить видео",
-    buttonUrl: "",
-    icon: "Video",
-    image: "/images/hero-video.jpg",
-    video: "",
-    file: "",
-    visible: true
-  },
-  {
-    id: "quick-start",
-    section: "Главная",
-    title: "Быстрый старт",
-    subtitle: "Навигационные карточки",
-    text: "Три карточки: впервые на сайте, ученик, консультация.",
-    buttonText: "Редактировать карточки",
-    buttonUrl: "",
-    icon: "Folder",
-    image: "",
-    video: "",
-    file: "",
-    visible: true
-  },
-  {
-    id: "benefits",
-    section: "Главная",
-    title: "Преимущества",
-    subtitle: "Последний блок главной",
-    text: "Индивидуальный подход, практические рекомендации, опыт и экспертиза, поддержка на пути.",
-    buttonText: "",
-    buttonUrl: "",
-    icon: "Users",
-    image: "",
-    video: "",
-    file: "",
-    visible: true
-  },
-  {
-    id: "about-cards",
-    section: "Обо мне",
-    title: "Карточки автора",
-    subtitle: "Опыт, достижения, подход",
-    text: "Каждая карточка поддерживает заголовок, описание, иконку, порядок, изображение, видео и файл.",
-    buttonText: "",
-    buttonUrl: "",
-    icon: "Pencil",
-    image: "",
-    video: "",
-    file: "",
-    visible: true
-  },
-  {
-    id: "materials",
-    section: "Материалы",
-    title: "Бесплатные материалы",
-    subtitle: "Отдельный раздел сайта",
-    text: "Статьи и материалы не показываются на главной и управляются отдельно.",
-    buttonText: "Смотреть все статьи",
-    buttonUrl: "/materials",
-    icon: "FileText",
-    image: "",
-    video: "",
-    file: "",
-    visible: true
-  }
-];
+const defaultEmail = "admin@site.ru";
+const defaultPassword = "Admin2026!";
 
-const iconOptions = ["Compass", "Video", "Folder", "Users", "FileText", "Pencil", "Target", "Heart", "Shield", "BookOpen"];
+export function AdminPanel({ initialContent }: { initialContent: SiteContent }) {
+  const [email, setEmail] = useState(defaultEmail);
+  const [password, setPassword] = useState(defaultPassword);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [tab, setTab] = useState<Tab>("site");
+  const [content, setContent] = useState<SiteContent>(initialContent);
+  const [status, setStatus] = useState("Войдите, чтобы редактировать сайт.");
+  const [saving, setSaving] = useState(false);
 
-export function AdminPanel() {
-  const [blocks, setBlocks] = useState<CmsBlock[]>(initialBlocks);
-  const [activeId, setActiveId] = useState(initialBlocks[0].id);
-  const [status, setStatus] = useState("Черновик готов к редактированию.");
+  const canSave = useMemo(() => loggedIn && !saving, [loggedIn, saving]);
 
-  useEffect(() => {
-    const saved = window.localStorage.getItem("site-v2-cms-draft");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved) as CmsBlock[];
-        setBlocks(parsed);
-        setActiveId(parsed[0]?.id || initialBlocks[0].id);
-      } catch {
-        setStatus("Не удалось прочитать локальный черновик.");
-      }
+  async function login(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setStatus("Проверяю доступ...");
+    const response = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+
+    if (!response.ok) {
+      setLoggedIn(false);
+      setStatus("Неверный логин или пароль.");
+      return;
     }
-  }, []);
 
-  const activeBlock = useMemo(
-    () => blocks.find((block) => block.id === activeId) || blocks[0],
-    [activeId, blocks]
-  );
-
-  function updateBlock(patch: Partial<CmsBlock>) {
-    setBlocks((current) => current.map((block) => (block.id === activeBlock.id ? { ...block, ...patch } : block)));
+    setLoggedIn(true);
+    setStatus("Доступ открыт. Можно редактировать сайт.");
   }
 
-  function addBlock() {
-    const next: CmsBlock = {
-      id: `block-${Date.now()}`,
-      section: "Новый раздел",
-      title: "Новый блок",
-      subtitle: "Подзаголовок",
-      text: "Текст блока",
-      buttonText: "Кнопка",
-      buttonUrl: "",
-      icon: "Folder",
-      image: "",
-      video: "",
-      file: "",
-      visible: true
-    };
-    setBlocks((current) => [...current, next]);
-    setActiveId(next.id);
-    setStatus("Новый блок добавлен.");
-  }
-
-  function deleteBlock(id: string) {
-    setBlocks((current) => {
-      const next = current.filter((block) => block.id !== id);
-      setActiveId(next[0]?.id || "");
-      return next;
+  async function saveContent() {
+    if (!canSave) return;
+    setSaving(true);
+    setStatus("Сохраняю изменения в Supabase...");
+    const response = await fetch("/api/admin/content", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, content })
     });
-    setStatus("Блок удален из черновика.");
+    const result = (await response.json().catch(() => ({}))) as { ok?: boolean; message?: string };
+    setSaving(false);
+
+    if (!response.ok || !result.ok) {
+      setStatus(result.message || "Не удалось сохранить изменения.");
+      return;
+    }
+
+    setStatus("Сохранено онлайн. Обновите сайт - изменения уже опубликованы.");
   }
 
-  function moveBlock(id: string, direction: -1 | 1) {
-    setBlocks((current) => {
-      const index = current.findIndex((block) => block.id === id);
-      const target = index + direction;
-      if (index < 0 || target < 0 || target >= current.length) return current;
-      const next = [...current];
-      [next[index], next[target]] = [next[target], next[index]];
-      return next;
+  function updateContent(patch: Partial<SiteContent>) {
+    setContent((current) => ({ ...current, ...patch }));
+  }
+
+  function updateArticle(index: number, patch: Partial<Article>) {
+    setContent((current) => ({
+      ...current,
+      articles: current.articles.map((article, articleIndex) =>
+        articleIndex === index ? { ...article, ...patch } : article
+      )
+    }));
+  }
+
+  function addArticle() {
+    setContent((current) => ({
+      ...current,
+      articles: [
+        ...current.articles,
+        {
+          slug: `article-${Date.now()}`,
+          title: "Новая статья",
+          category: "Материалы",
+          date: new Date().toLocaleDateString("ru-RU"),
+          excerpt: "Краткое описание статьи.",
+          image: "/images/article-notes.jpg",
+          body: ["Первый абзац статьи."]
+        }
+      ]
+    }));
+  }
+
+  function deleteArticle(index: number) {
+    setContent((current) => ({
+      ...current,
+      articles: current.articles.filter((_, articleIndex) => articleIndex !== index)
+    }));
+  }
+
+  function updateStudent(index: number, patch: Partial<Student>) {
+    setContent((current) => ({
+      ...current,
+      students: current.students.map((student, studentIndex) =>
+        studentIndex === index ? { ...student, ...patch } : student
+      )
+    }));
+  }
+
+  function addStudent() {
+    setContent((current) => ({
+      ...current,
+      students: [
+        ...current.students,
+        {
+          code: `CODE${current.students.length + 1}`,
+          name: "Новый ученик",
+          cards: [
+            {
+              icon: "folder",
+              title: "Материалы",
+              text: "Персональные материалы ученика."
+            }
+          ]
+        }
+      ]
+    }));
+  }
+
+  function parseQuickCards(value: string): QuickCard[] {
+    return value.split("\n").filter(Boolean).map((line) => {
+      const [title = "Карточка", text = "Описание", action = "Открыть", href = "/", tone = "blue"] = line.split("|");
+      return {
+        title,
+        text,
+        action,
+        href,
+        tone: tone === "orange" || tone === "violet" ? tone : "blue"
+      };
     });
-    setStatus("Порядок блоков изменен.");
   }
 
-  function saveDraft() {
-    window.localStorage.setItem("site-v2-cms-draft", JSON.stringify(blocks));
-    setStatus("Изменения сохранены локально. Для онлайн-сохранения подключите Supabase запись.");
+  function parseBenefits(value: string): Benefit[] {
+    return value.split("\n").filter(Boolean).map((line) => {
+      const [title = "Преимущество", text = "Описание"] = line.split("|");
+      return { title, text };
+    });
+  }
+
+  function deleteStudent(index: number) {
+    setContent((current) => ({
+      ...current,
+      students: current.students.filter((_, studentIndex) => studentIndex !== index)
+    }));
+  }
+
+  if (!loggedIn) {
+    return (
+      <main className="admin-page cms-admin">
+        <section className="admin-board admin-login">
+          <div className="admin-head">
+            <div>
+              <h1>Вход в админку</h1>
+              <p>{status}</p>
+            </div>
+            <Lock size={34} />
+          </div>
+          <form className="cms-form" onSubmit={login}>
+            <label>
+              Почта
+              <input autoComplete="username" value={email} onChange={(event) => setEmail(event.target.value)} />
+            </label>
+            <label>
+              Пароль
+              <input
+                autoComplete="current-password"
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+            </label>
+            <button className="wide-button" type="submit">
+              Войти
+            </button>
+          </form>
+        </section>
+      </main>
+    );
   }
 
   return (
     <main className="admin-page cms-admin">
       <aside className="admin-sidebar">
         <strong>Панель управления</strong>
-        <a className="active"><Folder /> Разделы и блоки</a>
-        <a><FileText /> Тексты</a>
-        <a><ImageIcon /> Изображения</a>
-        <a><Video /> Видео</a>
-        <a><FileArchive /> Файлы</a>
-        <a><Settings /> Настройки</a>
+        <button className={tab === "site" ? "active" : ""} onClick={() => setTab("site")} type="button">
+          <Settings /> Сайт
+        </button>
+        <button className={tab === "articles" ? "active" : ""} onClick={() => setTab("articles")} type="button">
+          <FileText /> Статьи
+        </button>
+        <button className={tab === "students" ? "active" : ""} onClick={() => setTab("students")} type="button">
+          <UserRound /> Ученики
+        </button>
       </aside>
 
       <section className="admin-board">
@@ -214,83 +209,108 @@ export function AdminPanel() {
             <p>{status}</p>
           </div>
           <div className="admin-actions">
-            <button onClick={addBlock} type="button"><Plus size={18} />Добавить блок</button>
-            <button className="quiet-action" onClick={saveDraft} type="button"><Save size={18} />Сохранить</button>
+            <button className="quiet-action" disabled={saving} onClick={saveContent} type="button">
+              <Save size={18} />
+              {saving ? "Сохраняю..." : "Сохранить онлайн"}
+            </button>
           </div>
         </div>
 
-        <div className="cms-grid">
-          <article className="admin-card">
-            <h2>Структура сайта</h2>
-            <p className="admin-note">Здесь меняются порядок, видимость, названия разделов и карточек.</p>
-            <div className="cms-block-list">
-              {blocks.map((block, index) => (
-                <button
-                  className={block.id === activeBlock.id ? "selected" : ""}
-                  key={block.id}
-                  onClick={() => setActiveId(block.id)}
-                  type="button"
-                >
-                  <span>
-                    <b>{index + 1}. {block.section}</b>
-                    <small>{block.title}</small>
-                  </span>
-                  {block.visible ? <Eye size={16} /> : <EyeOff size={16} />}
-                </button>
+        {tab === "site" ? (
+          <article className="admin-card cms-editor">
+            <h2>Главная и общие настройки</h2>
+            <div className="cms-form">
+              <label>Название проекта<input value={content.brand} onChange={(event) => updateContent({ brand: event.target.value })} /></label>
+              <label>Логотип<input value={content.logo} onChange={(event) => updateContent({ logo: event.target.value })} /></label>
+              <label className="wide-field">Заголовок<input value={content.heroTitle} onChange={(event) => updateContent({ heroTitle: event.target.value })} /></label>
+              <label className="wide-field">Фиолетовая строка<input value={content.heroAccent} onChange={(event) => updateContent({ heroAccent: event.target.value })} /></label>
+              <label className="wide-field">Описание<textarea value={content.heroText} onChange={(event) => updateContent({ heroText: event.target.value })} /></label>
+              <label>Текст главной кнопки<input value={content.heroButtonText} onChange={(event) => updateContent({ heroButtonText: event.target.value })} /></label>
+              <label>Текст кнопки видео<input value={content.videoButtonText} onChange={(event) => updateContent({ videoButtonText: event.target.value })} /></label>
+              <label>Имя автора<input value={content.authorName} onChange={(event) => updateContent({ authorName: event.target.value })} /></label>
+              <label>Роль автора<input value={content.authorRole} onChange={(event) => updateContent({ authorRole: event.target.value })} /></label>
+              <label>Ссылка консультации<input value={content.consultationUrl} onChange={(event) => updateContent({ consultationUrl: event.target.value })} /></label>
+              <label>Видео MP4 / ссылка<input value={content.videoUrl} onChange={(event) => updateContent({ videoUrl: event.target.value })} /></label>
+              <label>Плашка инструкции<input value={content.howBadge} onChange={(event) => updateContent({ howBadge: event.target.value })} /></label>
+              <label>Заголовок инструкции<input value={content.howTitle} onChange={(event) => updateContent({ howTitle: event.target.value })} /></label>
+              <label className="wide-field">Текст инструкции<textarea value={content.howText} onChange={(event) => updateContent({ howText: event.target.value })} /></label>
+              <label>Картинка инструкции<input value={content.howImage} onChange={(event) => updateContent({ howImage: event.target.value })} /></label>
+              <label>Заголовок видео-инструкции<input value={content.howVideoTitle} onChange={(event) => updateContent({ howVideoTitle: event.target.value })} /></label>
+              <label className="wide-field">
+                Быстрый старт
+                <textarea
+                  value={content.quickCards.map((card) => `${card.title}|${card.text}|${card.action}|${card.href}|${card.tone}`).join("\n")}
+                  onChange={(event) => updateContent({ quickCards: parseQuickCards(event.target.value) })}
+                />
+              </label>
+              <label className="wide-field">
+                Преимущества
+                <textarea
+                  value={content.benefits.map((benefit) => `${benefit.title}|${benefit.text}`).join("\n")}
+                  onChange={(event) => updateContent({ benefits: parseBenefits(event.target.value) })}
+                />
+              </label>
+            </div>
+            <p className="admin-note">Формат быстрого старта: заголовок|текст|кнопка|ссылка|цвет. Цвет: blue, violet или orange.</p>
+            <p className="admin-note">Формат преимуществ: заголовок|текст. Каждое преимущество с новой строки.</p>
+          </article>
+        ) : null}
+
+        {tab === "articles" ? (
+          <article className="admin-card cms-editor">
+            <div className="section-head">
+              <h2>Статьи и материалы</h2>
+              <button className="quiet-action" onClick={addArticle} type="button"><Plus size={17} />Добавить статью</button>
+            </div>
+            <div className="cms-stack">
+              {content.articles.map((article, index) => (
+                <section className="cms-item" key={`${article.slug}-${index}`}>
+                  <div className="cms-toolbar">
+                    <strong>Статья {index + 1}</strong>
+                    <button className="danger-action" onClick={() => deleteArticle(index)} type="button"><Trash2 size={16} />Удалить</button>
+                  </div>
+                  <div className="cms-form">
+                    <label>Slug<input value={article.slug} onChange={(event) => updateArticle(index, { slug: event.target.value })} /></label>
+                    <label>Дата<input value={article.date} onChange={(event) => updateArticle(index, { date: event.target.value })} /></label>
+                    <label>Категория<input value={article.category} onChange={(event) => updateArticle(index, { category: event.target.value })} /></label>
+                    <label>Картинка<input value={article.image} onChange={(event) => updateArticle(index, { image: event.target.value })} /></label>
+                    <label className="wide-field">Название<input value={article.title} onChange={(event) => updateArticle(index, { title: event.target.value })} /></label>
+                    <label className="wide-field">Краткое описание<textarea value={article.excerpt} onChange={(event) => updateArticle(index, { excerpt: event.target.value })} /></label>
+                    <label className="wide-field">Текст статьи<textarea value={article.body.join("\n\n")} onChange={(event) => updateArticle(index, { body: event.target.value.split(/\n{2,}/).filter(Boolean) })} /></label>
+                  </div>
+                </section>
               ))}
             </div>
           </article>
+        ) : null}
 
+        {tab === "students" ? (
           <article className="admin-card cms-editor">
-            <h2>Редактирование блока</h2>
-            {activeBlock ? (
-              <>
-                <div className="cms-toolbar">
-                  <button onClick={() => moveBlock(activeBlock.id, -1)} type="button"><ArrowUp size={16} />Выше</button>
-                  <button onClick={() => moveBlock(activeBlock.id, 1)} type="button"><ArrowDown size={16} />Ниже</button>
-                  <button onClick={() => updateBlock({ visible: !activeBlock.visible })} type="button">
-                    {activeBlock.visible ? <EyeOff size={16} /> : <Eye size={16} />}
-                    {activeBlock.visible ? "Скрыть" : "Показать"}
-                  </button>
-                  <button className="danger-action" onClick={() => deleteBlock(activeBlock.id)} type="button"><Trash2 size={16} />Удалить</button>
-                </div>
-
-                <div className="cms-form">
-                  <label>Раздел<input value={activeBlock.section} onChange={(event) => updateBlock({ section: event.target.value })} /></label>
-                  <label>Заголовок<input value={activeBlock.title} onChange={(event) => updateBlock({ title: event.target.value })} /></label>
-                  <label>Подзаголовок<input value={activeBlock.subtitle} onChange={(event) => updateBlock({ subtitle: event.target.value })} /></label>
-                  <label className="wide-field">Текст<textarea value={activeBlock.text} onChange={(event) => updateBlock({ text: event.target.value })} /></label>
-                  <label>Текст кнопки<input value={activeBlock.buttonText} onChange={(event) => updateBlock({ buttonText: event.target.value })} /></label>
-                  <label>Ссылка кнопки<input value={activeBlock.buttonUrl} onChange={(event) => updateBlock({ buttonUrl: event.target.value })} /></label>
-                  <label>
-                    Иконка
-                    <select value={activeBlock.icon} onChange={(event) => updateBlock({ icon: event.target.value })}>
-                      {iconOptions.map((icon) => <option key={icon}>{icon}</option>)}
-                    </select>
-                  </label>
-                  <label>Изображение<input value={activeBlock.image} onChange={(event) => updateBlock({ image: event.target.value })} placeholder="/images/example.png" /></label>
-                  <label>Видео<input value={activeBlock.video} onChange={(event) => updateBlock({ video: event.target.value })} placeholder="MP4, YouTube, VK, Rutube" /></label>
-                  <label>Файл<input value={activeBlock.file} onChange={(event) => updateBlock({ file: event.target.value })} placeholder="PDF, DOCX, ZIP..." /></label>
-                </div>
-              </>
-            ) : null}
-          </article>
-
-          <article className="admin-card cms-preview">
-            <h2>Предпросмотр структуры блока</h2>
-            <div className="preview-sequence">
-              <strong>{activeBlock?.title}</strong>
-              <p>{activeBlock?.text}</p>
-              <span><ImageIcon size={17} /> Изображение: {activeBlock?.image || "не задано"}</span>
-              <span><Video size={17} /> Видео: {activeBlock?.video || "не задано"}</span>
-              <span><FileArchive size={17} /> Файл: {activeBlock?.file || "не задано"}</span>
-              <span><Link2 size={17} /> Кнопка: {activeBlock?.buttonText || "не задана"}</span>
+            <div className="section-head">
+              <h2>Личные кабинеты учеников</h2>
+              <button className="quiet-action" onClick={addStudent} type="button"><Plus size={17} />Добавить ученика</button>
             </div>
-            <p className="admin-note">
-              Единый порядок для информационных разделов: заголовок, текст, изображение, видео, файл.
-            </p>
+            <div className="cms-stack">
+              {content.students.map((student, index) => (
+                <section className="cms-item" key={`${student.code}-${index}`}>
+                  <div className="cms-toolbar">
+                    <strong>{student.name} / код: {student.code}</strong>
+                    <button className="danger-action" onClick={() => deleteStudent(index)} type="button"><Trash2 size={16} />Удалить</button>
+                  </div>
+                  <div className="cms-form">
+                    <label>Имя<input value={student.name} onChange={(event) => updateStudent(index, { name: event.target.value })} /></label>
+                    <label>Код входа<input value={student.code} onChange={(event) => updateStudent(index, { code: event.target.value })} /></label>
+                    <label className="wide-field">Карточки ученика<textarea value={student.cards.map((card) => `${card.icon}|${card.title}|${card.text}`).join("\n")} onChange={(event) => updateStudent(index, { cards: event.target.value.split("\n").filter(Boolean).map((line) => {
+                      const [icon = "folder", title = "Карточка", text = "Описание"] = line.split("|");
+                      return { icon, title, text };
+                    }) })} /></label>
+                  </div>
+                  <p className="admin-note">Формат карточки: icon|заголовок|текст. Каждая карточка с новой строки.</p>
+                </section>
+              ))}
+            </div>
           </article>
-        </div>
+        ) : null}
       </section>
     </main>
   );
