@@ -5,7 +5,10 @@ import { getContent } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "RouteLab | Профориентация и обучение",
-  description: "Современная платформа наставника: материалы, кабинет ученика, консультации и база знаний."
+  description: "Современная платформа наставника: материалы, кабинет ученика, консультации и база знаний.",
+  icons: {
+    icon: "/favicon.svg"
+  }
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

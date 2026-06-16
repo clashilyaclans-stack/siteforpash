@@ -20,11 +20,8 @@ import { getContent } from "@/lib/content";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-const categories = ["Все статьи", "Профориентация", "Математика", "Саморазвитие", "Полезное", "Для родителей"];
-
 export default async function HomePage() {
   const content = await getContent();
-  const latest = content.articles.slice(0, 4);
 
   return (
     <main className="home-reference">
@@ -76,11 +73,17 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="start-layout" aria-label="Как пользоваться сайтом и быстрый старт">
-        <article className="reference-video">
+      <section className="start-layout" aria-label="Инструкция и быстрый старт">
+        <article className="reference-video content-sequence">
           <span className="small-pill">Начните отсюда</span>
           <h2>Как пользоваться сайтом?</h2>
-          <p>Посмотрите короткое видео (2-3 минуты), чтобы понять, как получить максимум пользы от сайта.</p>
+          <p>
+            Посмотрите короткую инструкцию: где искать материалы, как пользоваться кабинетом ученика
+            и как получить максимум пользы от сайта.
+          </p>
+          <figure className="instruction-image">
+            <Image alt="Визуальное вступление к инструкции" src="/images/hero-video.jpg" width={720} height={420} />
+          </figure>
           <div className="video-preview">
             <Image alt="" src="/images/hero-video.jpg" fill sizes="(max-width: 760px) 100vw, 440px" />
             <div>
@@ -127,47 +130,11 @@ export default async function HomePage() {
         </article>
       </section>
 
-      <section className="benefit-strip" aria-label="Преимущества">
-        <Benefit icon={<UsersRound />} title="Индивидуальный подход" text="Учитываем ваши интересы, способности и цели" />
-        <Benefit icon={<Target />} title="Практические рекомендации" text="Конкретные шаги и план для достижения цели" />
-        <Benefit icon={<Shield />} title="Опыт и экспертиза" text="Помогаю школьникам и студентам найти себя с 2019 года" />
-        <Benefit icon={<Heart />} title="Поддержка на пути" text="Всегда на связи и готов помочь на каждом этапе" />
-      </section>
-
-      <section className="knowledge-panel" aria-label="База знаний">
-        <div className="knowledge-head">
-          <div>
-            <span className="small-pill">База знаний</span>
-            <h2>Актуальные материалы для роста и развития</h2>
-          </div>
-          <Link className="text-link" href="/materials">
-            Смотреть все статьи
-            <ArrowRight size={15} />
-          </Link>
-        </div>
-        <div className="category-tabs" aria-label="Категории">
-          {categories.map((category, index) => (
-            <button className={index === 0 ? "active" : ""} key={category} type="button">
-              {category}
-            </button>
-          ))}
-        </div>
-        <div className="reference-articles">
-          {latest.map((article) => (
-            <Link className="reference-article" href={`/materials/${article.slug}`} key={article.slug}>
-              <Image alt="" src={article.image} width={330} height={190} />
-              <span>{article.category}</span>
-              <h3>{article.title}</h3>
-              <div>
-                <time>{article.date}</time>
-                <b>
-                  Читать
-                  <ArrowRight size={14} />
-                </b>
-              </div>
-            </Link>
-          ))}
-        </div>
+      <section className="benefit-strip final-home-block" aria-label="Преимущества">
+        <Benefit icon={<UsersRound />} title="Индивидуальный подход" text="Учитываем ваши интересы, способности и цели." />
+        <Benefit icon={<Target />} title="Практические рекомендации" text="Конкретные шаги и план для достижения цели." />
+        <Benefit icon={<Shield />} title="Опыт и экспертиза" text="Помогаю школьникам и студентам найти себя с 2019 года." />
+        <Benefit icon={<Heart />} title="Поддержка на пути" text="Всегда на связи и готов помочь на каждом этапе." />
       </section>
     </main>
   );
